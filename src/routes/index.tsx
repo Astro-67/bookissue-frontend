@@ -1,4 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Navigate } from '@tanstack/react-router'
+
 
 
 export const Route = createFileRoute('/')({
@@ -7,8 +9,6 @@ export const Route = createFileRoute('/')({
 
 function App() {
   return (
-    <h1 className="text-3xl font-bold ">
-    Hello world!
-  </h1>
+    <Navigate to="/login" />
   )
 }

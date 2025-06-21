@@ -8,39 +8,299 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { createFileRoute } from '@tanstack/react-router'
 
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as R404RouteImport } from './routes/404'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as StudentTicketsRouteImport } from './routes/student/tickets'
+import { Route as StudentProfileRouteImport } from './routes/student/profile'
+import { Route as StudentDashboardRouteImport } from './routes/student/dashboard'
+import { Route as StudentLayoutRouteImport } from './routes/student/_layout'
+import { Route as StaffTicketsRouteImport } from './routes/staff/tickets'
+import { Route as StaffDashboardRouteImport } from './routes/staff/dashboard'
+import { Route as StaffLayoutRouteImport } from './routes/staff/_layout'
+import { Route as IctTicketsRouteImport } from './routes/ict/tickets'
+import { Route as IctNotificationsRouteImport } from './routes/ict/notifications'
+import { Route as IctDashboardRouteImport } from './routes/ict/dashboard'
+import { Route as IctLayoutRouteImport } from './routes/ict/_layout'
+import { Route as StudentTicketTicketIdRouteImport } from './routes/student/ticket/$ticketId'
+import { Route as StaffTicketTicketIdRouteImport } from './routes/staff/ticket/$ticketId'
+import { Route as IctTicketTicketIdRouteImport } from './routes/ict/ticket/$ticketId'
+
+const StudentRouteImport = createFileRoute('/student')()
+const StaffRouteImport = createFileRoute('/staff')()
+const IctRouteImport = createFileRoute('/ict')()
+
+const StudentRoute = StudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IctRoute = IctRouteImport.update({
+  id: '/ict',
+  path: '/ict',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R404Route = R404RouteImport.update({
+  id: '/404',
+  path: '/404',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentTicketsRoute = StudentTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentProfileRoute = StudentProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentDashboardRoute = StudentDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentLayoutRoute = StudentLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StaffTicketsRoute = StaffTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffDashboardRoute = StaffDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffLayoutRoute = StaffLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => StaffRoute,
+} as any)
+const IctTicketsRoute = IctTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => IctRoute,
+} as any)
+const IctNotificationsRoute = IctNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => IctRoute,
+} as any)
+const IctDashboardRoute = IctDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => IctRoute,
+} as any)
+const IctLayoutRoute = IctLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => IctRoute,
+} as any)
+const StudentTicketTicketIdRoute = StudentTicketTicketIdRouteImport.update({
+  id: '/ticket/$ticketId',
+  path: '/ticket/$ticketId',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StaffTicketTicketIdRoute = StaffTicketTicketIdRouteImport.update({
+  id: '/ticket/$ticketId',
+  path: '/ticket/$ticketId',
+  getParentRoute: () => StaffRoute,
+} as any)
+const IctTicketTicketIdRoute = IctTicketTicketIdRouteImport.update({
+  id: '/ticket/$ticketId',
+  path: '/ticket/$ticketId',
+  getParentRoute: () => IctRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/login': typeof LoginRoute
+  '/ict': typeof IctLayoutRoute
+  '/ict/dashboard': typeof IctDashboardRoute
+  '/ict/notifications': typeof IctNotificationsRoute
+  '/ict/tickets': typeof IctTicketsRoute
+  '/staff': typeof StaffLayoutRoute
+  '/staff/dashboard': typeof StaffDashboardRoute
+  '/staff/tickets': typeof StaffTicketsRoute
+  '/student': typeof StudentLayoutRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/student/profile': typeof StudentProfileRoute
+  '/student/tickets': typeof StudentTicketsRoute
+  '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
+  '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
+  '/student/ticket/$ticketId': typeof StudentTicketTicketIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/login': typeof LoginRoute
+  '/ict': typeof IctLayoutRoute
+  '/ict/dashboard': typeof IctDashboardRoute
+  '/ict/notifications': typeof IctNotificationsRoute
+  '/ict/tickets': typeof IctTicketsRoute
+  '/staff': typeof StaffLayoutRoute
+  '/staff/dashboard': typeof StaffDashboardRoute
+  '/staff/tickets': typeof StaffTicketsRoute
+  '/student': typeof StudentLayoutRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/student/profile': typeof StudentProfileRoute
+  '/student/tickets': typeof StudentTicketsRoute
+  '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
+  '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
+  '/student/ticket/$ticketId': typeof StudentTicketTicketIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/404': typeof R404Route
+  '/login': typeof LoginRoute
+  '/ict': typeof IctRouteWithChildren
+  '/ict/_layout': typeof IctLayoutRoute
+  '/ict/dashboard': typeof IctDashboardRoute
+  '/ict/notifications': typeof IctNotificationsRoute
+  '/ict/tickets': typeof IctTicketsRoute
+  '/staff': typeof StaffRouteWithChildren
+  '/staff/_layout': typeof StaffLayoutRoute
+  '/staff/dashboard': typeof StaffDashboardRoute
+  '/staff/tickets': typeof StaffTicketsRoute
+  '/student': typeof StudentRouteWithChildren
+  '/student/_layout': typeof StudentLayoutRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/student/profile': typeof StudentProfileRoute
+  '/student/tickets': typeof StudentTicketsRoute
+  '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
+  '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
+  '/student/ticket/$ticketId': typeof StudentTicketTicketIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/404'
+    | '/login'
+    | '/ict'
+    | '/ict/dashboard'
+    | '/ict/notifications'
+    | '/ict/tickets'
+    | '/staff'
+    | '/staff/dashboard'
+    | '/staff/tickets'
+    | '/student'
+    | '/student/dashboard'
+    | '/student/profile'
+    | '/student/tickets'
+    | '/ict/ticket/$ticketId'
+    | '/staff/ticket/$ticketId'
+    | '/student/ticket/$ticketId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/404'
+    | '/login'
+    | '/ict'
+    | '/ict/dashboard'
+    | '/ict/notifications'
+    | '/ict/tickets'
+    | '/staff'
+    | '/staff/dashboard'
+    | '/staff/tickets'
+    | '/student'
+    | '/student/dashboard'
+    | '/student/profile'
+    | '/student/tickets'
+    | '/ict/ticket/$ticketId'
+    | '/staff/ticket/$ticketId'
+    | '/student/ticket/$ticketId'
+  id:
+    | '__root__'
+    | '/'
+    | '/404'
+    | '/login'
+    | '/ict'
+    | '/ict/_layout'
+    | '/ict/dashboard'
+    | '/ict/notifications'
+    | '/ict/tickets'
+    | '/staff'
+    | '/staff/_layout'
+    | '/staff/dashboard'
+    | '/staff/tickets'
+    | '/student'
+    | '/student/_layout'
+    | '/student/dashboard'
+    | '/student/profile'
+    | '/student/tickets'
+    | '/ict/ticket/$ticketId'
+    | '/staff/ticket/$ticketId'
+    | '/student/ticket/$ticketId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R404Route: typeof R404Route
+  LoginRoute: typeof LoginRoute
+  IctRoute: typeof IctRouteWithChildren
+  StaffRoute: typeof StaffRouteWithChildren
+  StudentRoute: typeof StudentRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ict': {
+      id: '/ict'
+      path: '/ict'
+      fullPath: '/ict'
+      preLoaderRoute: typeof IctRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/404': {
+      id: '/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof R404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +308,167 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/tickets': {
+      id: '/student/tickets'
+      path: '/tickets'
+      fullPath: '/student/tickets'
+      preLoaderRoute: typeof StudentTicketsRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/profile': {
+      id: '/student/profile'
+      path: '/profile'
+      fullPath: '/student/profile'
+      preLoaderRoute: typeof StudentProfileRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/dashboard': {
+      id: '/student/dashboard'
+      path: '/dashboard'
+      fullPath: '/student/dashboard'
+      preLoaderRoute: typeof StudentDashboardRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/_layout': {
+      id: '/student/_layout'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentLayoutRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/staff/tickets': {
+      id: '/staff/tickets'
+      path: '/tickets'
+      fullPath: '/staff/tickets'
+      preLoaderRoute: typeof StaffTicketsRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/dashboard': {
+      id: '/staff/dashboard'
+      path: '/dashboard'
+      fullPath: '/staff/dashboard'
+      preLoaderRoute: typeof StaffDashboardRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/_layout': {
+      id: '/staff/_layout'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffLayoutRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/ict/tickets': {
+      id: '/ict/tickets'
+      path: '/tickets'
+      fullPath: '/ict/tickets'
+      preLoaderRoute: typeof IctTicketsRouteImport
+      parentRoute: typeof IctRoute
+    }
+    '/ict/notifications': {
+      id: '/ict/notifications'
+      path: '/notifications'
+      fullPath: '/ict/notifications'
+      preLoaderRoute: typeof IctNotificationsRouteImport
+      parentRoute: typeof IctRoute
+    }
+    '/ict/dashboard': {
+      id: '/ict/dashboard'
+      path: '/dashboard'
+      fullPath: '/ict/dashboard'
+      preLoaderRoute: typeof IctDashboardRouteImport
+      parentRoute: typeof IctRoute
+    }
+    '/ict/_layout': {
+      id: '/ict/_layout'
+      path: '/ict'
+      fullPath: '/ict'
+      preLoaderRoute: typeof IctLayoutRouteImport
+      parentRoute: typeof IctRoute
+    }
+    '/student/ticket/$ticketId': {
+      id: '/student/ticket/$ticketId'
+      path: '/ticket/$ticketId'
+      fullPath: '/student/ticket/$ticketId'
+      preLoaderRoute: typeof StudentTicketTicketIdRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/staff/ticket/$ticketId': {
+      id: '/staff/ticket/$ticketId'
+      path: '/ticket/$ticketId'
+      fullPath: '/staff/ticket/$ticketId'
+      preLoaderRoute: typeof StaffTicketTicketIdRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/ict/ticket/$ticketId': {
+      id: '/ict/ticket/$ticketId'
+      path: '/ticket/$ticketId'
+      fullPath: '/ict/ticket/$ticketId'
+      preLoaderRoute: typeof IctTicketTicketIdRouteImport
+      parentRoute: typeof IctRoute
+    }
   }
 }
 
+interface IctRouteChildren {
+  IctLayoutRoute: typeof IctLayoutRoute
+  IctDashboardRoute: typeof IctDashboardRoute
+  IctNotificationsRoute: typeof IctNotificationsRoute
+  IctTicketsRoute: typeof IctTicketsRoute
+  IctTicketTicketIdRoute: typeof IctTicketTicketIdRoute
+}
+
+const IctRouteChildren: IctRouteChildren = {
+  IctLayoutRoute: IctLayoutRoute,
+  IctDashboardRoute: IctDashboardRoute,
+  IctNotificationsRoute: IctNotificationsRoute,
+  IctTicketsRoute: IctTicketsRoute,
+  IctTicketTicketIdRoute: IctTicketTicketIdRoute,
+}
+
+const IctRouteWithChildren = IctRoute._addFileChildren(IctRouteChildren)
+
+interface StaffRouteChildren {
+  StaffLayoutRoute: typeof StaffLayoutRoute
+  StaffDashboardRoute: typeof StaffDashboardRoute
+  StaffTicketsRoute: typeof StaffTicketsRoute
+  StaffTicketTicketIdRoute: typeof StaffTicketTicketIdRoute
+}
+
+const StaffRouteChildren: StaffRouteChildren = {
+  StaffLayoutRoute: StaffLayoutRoute,
+  StaffDashboardRoute: StaffDashboardRoute,
+  StaffTicketsRoute: StaffTicketsRoute,
+  StaffTicketTicketIdRoute: StaffTicketTicketIdRoute,
+}
+
+const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
+
+interface StudentRouteChildren {
+  StudentLayoutRoute: typeof StudentLayoutRoute
+  StudentDashboardRoute: typeof StudentDashboardRoute
+  StudentProfileRoute: typeof StudentProfileRoute
+  StudentTicketsRoute: typeof StudentTicketsRoute
+  StudentTicketTicketIdRoute: typeof StudentTicketTicketIdRoute
+}
+
+const StudentRouteChildren: StudentRouteChildren = {
+  StudentLayoutRoute: StudentLayoutRoute,
+  StudentDashboardRoute: StudentDashboardRoute,
+  StudentProfileRoute: StudentProfileRoute,
+  StudentTicketsRoute: StudentTicketsRoute,
+  StudentTicketTicketIdRoute: StudentTicketTicketIdRoute,
+}
+
+const StudentRouteWithChildren =
+  StudentRoute._addFileChildren(StudentRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R404Route: R404Route,
+  LoginRoute: LoginRoute,
+  IctRoute: IctRouteWithChildren,
+  StaffRoute: StaffRouteWithChildren,
+  StudentRoute: StudentRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
