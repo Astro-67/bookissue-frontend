@@ -18,9 +18,12 @@
     "@tanstack/router-plugin": "^1.121.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {
+    "@tanstack/router-cli": "^1.121.27",
+    "@tanstack/router-devtools": "^1.121.27",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.8",

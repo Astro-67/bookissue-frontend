@@ -1,9 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/ict/_layout')({
-  component: RouteComponent,
+  component: () => <Outlet />,
 })
 
-function RouteComponent() {
-  return <div>Hello "/ict/_layout"!</div>
-}
