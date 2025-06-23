@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouterState } from '@tanstack/react-router'
 import { 
   RiDashboardLine, 
@@ -15,6 +15,7 @@ import {
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { Sidebar } from './Sidebar'
+import { useAuth } from '../contexts/AuthContext'
 
 interface SharedLayoutProps {
   role: 'student' | 'staff' | 'ict'
@@ -73,18 +74,34 @@ const roleConfig = {
 export const SharedLayout: React.FC<SharedLayoutProps> = ({ role, children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const router = useRouterState()
+  const { logout, user } = useAuth()
   const config = roleConfig[role]
+
+  // Check if the user's role matches the current route
+  useEffect(() => {
+    if (user && user.role !== role) {
+      // If user role doesn't match the route, redirect to correct dashboard
+      window.location.href = `/${user.role}/dashboard`;
+    }
+  }, [user, role]);
 
   const isActive = (href: string) => {
     return router.location.pathname === href
   }
 
   const handleSignOut = () => {
-    window.location.href = '/login'
+    logout()
   }
 
+  // Use actual user data if available, fallback to role config
+  const displayUser = user ? {
+    name: user.full_name || `${user.first_name} ${user.last_name}`,
+    id: user.student_id || user.email,
+    avatar: user.first_name?.[0]?.toUpperCase() + (user.last_name?.[0]?.toUpperCase() || ''),
+  } : config.user;
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -97,7 +114,7 @@ export const SharedLayout: React.FC<SharedLayoutProps> = ({ role, children }) =>
       <Sidebar
         title={config.title}
         navigation={config.navigation}
-        user={config.user}
+        user={displayUser}
         sidebarOpen={sidebarOpen}
         onSidebarClose={() => setSidebarOpen(false)}
         isActive={isActive}
@@ -105,23 +122,24 @@ export const SharedLayout: React.FC<SharedLayoutProps> = ({ role, children }) =>
       />
 
       {/* Main content wrapper */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-64 flex flex-col min-h-screen">
         {/* Top header */}
         <Header
           title={config.title}
-          userName={config.user.name}
-          userAvatar={config.user.avatar}
+          userName={displayUser.name}
+          userAvatar={displayUser.avatar}
           onMobileMenuToggle={() => setSidebarOpen(true)}
+          onLogout={handleSignOut}
         />
 
         {/* Main content area */}
-        <main className="min-h-screen bg-gray-50 py-8">
+        <main className="flex-1 bg-gray-50 py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {children}
           </div>
         </main>
 
-        {/* Footer */}
+        {/* Sticky Footer */}
         <Footer />
       </div>
     </div>

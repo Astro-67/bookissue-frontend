@@ -10,6 +10,7 @@ import { routeTree } from "./routeTree.gen";
 
 import reportWebVitals from "./reportWebVitals.ts";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { AuthProvider } from "./contexts/AuthContext";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -39,8 +40,10 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-        <ReactQueryDevtools initialIsOpen={false} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </AuthProvider>
       </QueryClientProvider>
     </StrictMode>
   );

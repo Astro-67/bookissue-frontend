@@ -1,27 +1,34 @@
 import React, { useState } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { Logo } from '../../../ui/Logo'
+import { useLogin } from '../../../hooks/api'
+import type { LoginCredentials } from '../../../types/api'
 
 export const LoginForm: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const router = useRouter()
+  const [formData, setFormData] = useState<LoginCredentials>({
     email: '',
     password: ''
   })
 
+  const loginMutation = useLogin()
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Demo: Determine role based on email
-    let role = 'student' // default
-    if (formData.email.includes('staff') || formData.email === 'staff@demo.com') {
-      role = 'staff'
-    } else if (formData.email.includes('ict') || formData.email === 'ict@demo.com') {
-      role = 'ict'
-    }
-    
-    console.log('Login attempt:', formData, 'Role:', role)
-    
-    // Navigate to appropriate dashboard
-    window.location.href = `/${role}/dashboard`
+    loginMutation.mutate(formData, {
+      onSuccess: (data) => {
+        console.log('Login successful:', data)
+        
+        // Navigate to appropriate dashboard based on user role
+        const role = data.user.role
+        router.navigate({ to: `/${role}/dashboard` })
+      },
+      onError: (error: any) => {
+        console.error('Login failed:', error)
+        // Error is already handled by the mutation state
+      },
+    })
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,36 +111,58 @@ export const LoginForm: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+              disabled={loginMutation.isPending}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 disabled:bg-indigo-300 disabled:cursor-not-allowed"
             >
-              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                <svg
-                  className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
-              Sign in
+              {loginMutation.isPending ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Signing in...
+                </div>
+              ) : (
+                <>
+                  <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                    <svg
+                      className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                  Sign in
+                </>
+              )}
             </button>
           </div>
 
+          {loginMutation.error && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <p className="text-red-800 text-sm">
+                {(loginMutation.error as any)?.response?.data?.detail || 
+                 (loginMutation.error as any)?.response?.data?.message ||
+                 (loginMutation.error as any)?.message || 
+                 'Login failed. Please check your credentials.'}
+              </p>
+            </div>
+          )}
+
           <div className="mt-6">
             <div className="text-center text-sm text-gray-600">
-              Demo Credentials:
+              Test Credentials:
             </div>
             <div className="mt-2 space-y-1 text-xs text-gray-500 text-center">
-              <div>Email: any valid email format</div>
-              <div>Password: demo123</div>
+              <div>Student: student@test.com / password123</div>
+              <div>Staff: staff@test.com / password123</div>
+              <div>ICT: ict@test.com / password123</div>
               <div className="text-xs text-gray-400 mt-1">
-                (Role will be determined by the system)
+                (Make sure your backend is running on port 8000)
               </div>
             </div>
           </div>
