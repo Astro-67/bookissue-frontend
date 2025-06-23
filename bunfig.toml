@@ -1,0 +1,17 @@
+[install]
+# Use exact versions for dependencies
+exact = true
+
+# Prefer Bun runtime over Node.js
+prefer = "bun"
+
+# Cache directory
+cache = "node_modules/.cache/bun"
+
+[run]
+# Use Bun runtime for scripts
+prefer = "bun"
+
+[test]
+# Test configuration
+runner = "bun"
