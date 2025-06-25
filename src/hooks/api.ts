@@ -105,11 +105,24 @@ export const useUpdateTicket = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, ticketData }: { id: number; ticketData: any }) => 
-      ticketsApi.updateTicket(id, ticketData),
+    mutationFn: ({ ticketId, data }: { ticketId: number; data: any }) => 
+      ticketsApi.updateTicket(ticketId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', variables.ticketId] });
+    },
+  });
+};
+
+export const useAssignTicket = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ ticketId, assignedToId }: { ticketId: number; assignedToId: number }) => 
+      ticketsApi.assignTicket(ticketId, assignedToId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', variables.ticketId] });
     },
   });
 };
@@ -131,6 +144,16 @@ export const useTicketComments = (ticketId: number) => {
     queryKey: ['comments', 'ticket', ticketId],
     queryFn: () => commentsApi.getTicketComments(ticketId),
     enabled: !!ticketId,
+    select: (data) => {
+      // Ensure we always return an array
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data && Array.isArray(data.results)) {
+        return data.results;
+      }
+      return [];
+    }
   });
 };
 

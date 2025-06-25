@@ -44,14 +44,14 @@ export const authApi = {
 };
 
 // Tickets API
-export const ticketsApi = {
-  getTickets: async (params?: { 
-    status?: string; 
+export const ticketsApi = {  getTickets: async (params?: {
+    status?: string;
     assigned_to?: number;
     created_by?: number;
     search?: string;
   }) => {
     const response = await api.get('/tickets/', { params });
+    // Return the full response to preserve pagination structure
     return response.data;
   },
   
@@ -88,6 +88,7 @@ export const ticketsApi = {
 export const commentsApi = {
   getTicketComments: async (ticketId: number) => {
     const response = await api.get(`/comments/tickets/${ticketId}/comments/`);
+    // Return the full response to preserve pagination structure
     return response.data;
   },
   

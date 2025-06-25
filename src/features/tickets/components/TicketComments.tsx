@@ -6,6 +6,7 @@ import {
   RiMessageLine 
 } from 'react-icons/ri';
 import { useTicketComments, useCreateComment } from '../../../hooks/api';
+import { useAuth } from '../../../contexts/AuthContext';
 import type { Comment } from '../../../types/api';
 
 interface TicketCommentsProps {
@@ -13,10 +14,25 @@ interface TicketCommentsProps {
 }
 
 const TicketComments: React.FC<TicketCommentsProps> = ({ ticketId }) => {
+  const { user } = useAuth();
   const { data: commentsData, isLoading, error } = useTicketComments(ticketId);
   
-  // Extract comments array from paginated response
-  const comments = commentsData?.results || [];
+  // Handle both array and paginated response formats
+  const comments = React.useMemo(() => {
+    if (!commentsData) return [];
+    
+    // If it's an array, return as-is
+    if (Array.isArray(commentsData)) {
+      return commentsData;
+    }
+    
+    // If it's paginated response, return results
+    if (commentsData.results && Array.isArray(commentsData.results)) {
+      return commentsData.results;
+    }
+    
+    return [];
+  }, [commentsData]);
   
   const createCommentMutation = useCreateComment();
   
@@ -133,36 +149,54 @@ const TicketComments: React.FC<TicketCommentsProps> = ({ ticketId }) => {
             </p>
           </div>
         ) : (
-          comments.map((comment: Comment) => (
-            <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <RiUserLine className="w-4 h-4 text-white" />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <p className="text-sm font-medium text-gray-900">
-                        {comment.author_details.first_name} {comment.author_details.last_name}
-                      </p>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                        {comment.author_details.role}
-                      </span>
+          comments.map((comment: Comment) => {
+            const isCurrentUser = user && comment.author_details.id === user.id;
+            
+            return (
+              <div key={comment.id} className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${isCurrentUser ? 'order-1' : 'order-2'}`}>
+                  <div className={`rounded-lg p-4 ${
+                    isCurrentUser 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <p className={`text-sm font-medium ${isCurrentUser ? 'text-blue-100' : 'text-gray-600'}`}>
+                          {comment.author_details.first_name} {comment.author_details.last_name}
+                        </p>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          isCurrentUser 
+                            ? 'bg-blue-400 text-blue-100' 
+                            : 'bg-gray-200 text-gray-700'
+                        }`}>
+                          {comment.author_details.role}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <RiTimeLine className="w-4 h-4 mr-1" />
+                    <div className="mb-2">
+                      <p className={`text-sm whitespace-pre-wrap ${isCurrentUser ? 'text-white' : 'text-gray-700'}`}>
+                        {comment.message}
+                      </p>
+                    </div>
+                    <div className={`flex items-center text-xs ${isCurrentUser ? 'text-blue-200' : 'text-gray-500'}`}>
+                      <RiTimeLine className="w-3 h-3 mr-1" />
                       {formatDate(comment.created_at)}
                     </div>
                   </div>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{comment.message}</p>
+                </div>
+                <div className={`flex-shrink-0 ${isCurrentUser ? 'order-2 ml-3' : 'order-1 mr-3'}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    isCurrentUser 
+                      ? 'bg-blue-500' 
+                      : 'bg-gray-500'
+                  }`}>
+                    <RiUserLine className="w-4 h-4 text-white" />
                   </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

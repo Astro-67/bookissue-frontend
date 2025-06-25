@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
+import ICTTicketsList from '../../features/tickets/components/ICTTicketsList'
 
 export const Route = createFileRoute('/ict/tickets')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <div>Hello "/ict/tickets"!</div>
+  return <ICTTicketsList />
 }
