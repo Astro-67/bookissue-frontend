@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, Link } from '@tanstack/react-router';
-import { useTicket, useAssignTicket, useUpdateTicket, useCreateComment } from '../../../hooks/api';
+import { useTicket, useAssignTicket, useUpdateTicket } from '../../../hooks/api';
 import { useAuth } from '../../../contexts/AuthContext';
 import TicketComments from './TicketComments';
 import { 
@@ -18,9 +18,6 @@ const ICTTicketDetail: React.FC = () => {
   const params = useParams({ from: '/ict/ticket/$ticketId' });
   const { ticketId } = params;
   const { user } = useAuth();
-  
-  const [newComment, setNewComment] = useState('');
-  const [isAddingComment, setIsAddingComment] = useState(false);
   
   if (!ticketId) {
     return (
@@ -47,7 +44,6 @@ const ICTTicketDetail: React.FC = () => {
   const { data: ticket, isLoading, error, refetch } = useTicket(ticketIdNumber);
   const assignTicketMutation = useAssignTicket();
   const updateTicketMutation = useUpdateTicket();
-  const createCommentMutation = useCreateComment();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -109,22 +105,6 @@ const ICTTicketDetail: React.FC = () => {
       refetch();
     } catch (error) {
       console.error('Failed to update status:', error);
-    }
-  };
-
-  const handleAddComment = async () => {
-    if (!ticket || !newComment.trim()) return;
-    
-    try {
-      await createCommentMutation.mutateAsync({
-        ticketId: ticket.id,
-        commentData: { message: newComment.trim() }
-      });
-      setNewComment('');
-      setIsAddingComment(false);
-      refetch();
-    } catch (error) {
-      console.error('Failed to add comment:', error);
     }
   };
 
@@ -204,47 +184,6 @@ const ICTTicketDetail: React.FC = () => {
                   <div className="prose max-w-none">
                     <p className="text-gray-700 whitespace-pre-wrap">{ticket.description}</p>
                   </div>
-                </div>
-                
-                {/* Quick Comment Section */}
-                <div className="border-t border-gray-200 pt-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">Add Comment</h3>
-                  {!isAddingComment ? (
-                    <button
-                      onClick={() => setIsAddingComment(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      Add Comment
-                    </button>
-                  ) : (
-                    <div className="space-y-3">
-                      <textarea
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Enter your comment..."
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={handleAddComment}
-                          disabled={!newComment.trim() || createCommentMutation.isPending}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                        >
-                          {createCommentMutation.isPending ? 'Adding...' : 'Add Comment'}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsAddingComment(false);
-                            setNewComment('');
-                          }}
-                          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 
                 {/* Comments Section */}
