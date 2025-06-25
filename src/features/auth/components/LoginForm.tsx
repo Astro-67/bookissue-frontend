@@ -18,14 +18,11 @@ export const LoginForm: React.FC = () => {
     
     loginMutation.mutate(formData, {
       onSuccess: (data) => {
-        console.log('Login successful:', data)
-        
         // Navigate to appropriate dashboard based on user role
         const role = data.user.role
         router.navigate({ to: `/${role}/dashboard` })
       },
-      onError: (error: any) => {
-        console.error('Login failed:', error)
+      onError: () => {
         // Error is already handled by the mutation state
       },
     })

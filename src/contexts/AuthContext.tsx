@@ -36,8 +36,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Initialize authentication state
   useEffect(() => {
-    console.log('Auth initialization:', { hasToken, user, isLoading, error });
-    
     if (!hasToken) {
       // No token, definitely not authenticated
       setIsAuthenticated(false);
@@ -48,7 +46,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsInitialized(true);
     } else if (error) {
       // Has token but API call failed, clear auth
-      console.log('Auth error:', error);
       handleLogout();
     }
     // If hasToken but still loading user data, wait...

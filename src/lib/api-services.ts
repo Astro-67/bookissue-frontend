@@ -43,6 +43,81 @@ export const authApi = {
   },
 };
 
+// Tickets API
+export const ticketsApi = {
+  getTickets: async (params?: { 
+    status?: string; 
+    assigned_to?: number;
+    created_by?: number;
+    search?: string;
+  }) => {
+    const response = await api.get('/tickets/', { params });
+    return response.data;
+  },
+  
+  getTicket: async (id: number) => {
+    const response = await api.get(`/tickets/${id}/`);
+    return response.data;
+  },
+  
+  createTicket: async (ticketData: {
+    title: string;
+    description: string;
+  }) => {
+    const response = await api.post('/tickets/', ticketData);
+    return response.data;
+  },
+  
+  updateTicket: async (id: number, ticketData: any) => {
+    const response = await api.patch(`/tickets/${id}/`, ticketData);
+    return response.data;
+  },
+  
+  deleteTicket: async (id: number) => {
+    const response = await api.delete(`/tickets/${id}/`);
+    return response.data;
+  },
+  
+  assignTicket: async (id: number, assignedToId: number) => {
+    const response = await api.post(`/tickets/${id}/assign/`, { assigned_to_id: assignedToId });
+    return response.data;
+  },
+};
+
+// Comments API
+export const commentsApi = {
+  getTicketComments: async (ticketId: number) => {
+    const response = await api.get(`/comments/tickets/${ticketId}/comments/`);
+    return response.data;
+  },
+  
+  createComment: async (ticketId: number, commentData: {
+    message: string;
+  }) => {
+    const response = await api.post(`/comments/tickets/${ticketId}/comments/`, commentData);
+    return response.data;
+  },
+  
+  getComment: async (commentId: number) => {
+    const response = await api.get(`/comments/${commentId}/`);
+    return response.data;
+  },
+  
+  updateComment: async (commentId: number, commentData: {
+    message: string;
+  }) => {
+    const response = await api.patch(`/comments/${commentId}/`, commentData);
+    return response.data;
+  },
+  
+  deleteComment: async (commentId: number) => {
+    const response = await api.delete(`/comments/${commentId}/`);
+    return response.data;
+  },
+};
+
 export default {
   auth: authApi,
+  tickets: ticketsApi,
+  comments: commentsApi,
 };

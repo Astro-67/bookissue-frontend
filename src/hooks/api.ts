@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { authApi } from '../lib/api-services';
+import { authApi, ticketsApi, commentsApi } from '../lib/api-services';
 
 // Auth hooks
 export const useLogin = () => {
@@ -66,5 +66,106 @@ export const useCurrentUser = () => {
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: authApi.changePassword,
+  });
+};
+
+// Tickets hooks
+export const useTickets = (params?: { 
+  status?: string; 
+  assigned_to?: number;
+  created_by?: number;
+  search?: string;
+}) => {
+  return useQuery({
+    queryKey: ['tickets', params],
+    queryFn: () => ticketsApi.getTickets(params),
+  });
+};
+
+export const useTicket = (id: number) => {
+  return useQuery({
+    queryKey: ['tickets', id],
+    queryFn: () => ticketsApi.getTicket(id),
+    enabled: !!id,
+  });
+};
+
+export const useCreateTicket = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ticketsApi.createTicket,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+    },
+  });
+};
+
+export const useUpdateTicket = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, ticketData }: { id: number; ticketData: any }) => 
+      ticketsApi.updateTicket(id, ticketData),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', variables.id] });
+    },
+  });
+};
+
+export const useDeleteTicket = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ticketsApi.deleteTicket,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+    },
+  });
+};
+
+// Comments hooks
+export const useTicketComments = (ticketId: number) => {
+  return useQuery({
+    queryKey: ['comments', 'ticket', ticketId],
+    queryFn: () => commentsApi.getTicketComments(ticketId),
+    enabled: !!ticketId,
+  });
+};
+
+export const useCreateComment = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ ticketId, commentData }: { ticketId: number; commentData: { message: string } }) => 
+      commentsApi.createComment(ticketId, commentData),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['comments', 'ticket', variables.ticketId] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', variables.ticketId] });
+    },
+  });
+};
+
+export const useUpdateComment = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ commentId, commentData }: { commentId: number; commentData: { message: string } }) => 
+      commentsApi.updateComment(commentId, commentData),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['comments', 'ticket', data.ticket] });
+    },
+  });
+};
+
+export const useDeleteComment = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: commentsApi.deleteComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments'] });
+    },
   });
 };

@@ -3,7 +3,6 @@ import { useRouterState } from '@tanstack/react-router'
 import { 
   RiDashboardLine, 
   RiTicketLine, 
-  RiAddLine, 
   RiUserLine, 
   RiTeamLine, 
   RiBookLine, 
@@ -29,7 +28,6 @@ const roleConfig = {
     navigation: [
       { name: 'Dashboard', href: '/student/dashboard', icon: RiDashboardLine },
       { name: 'My Issues', href: '/student/tickets', icon: RiTicketLine },
-      { name: 'Submit Issue', href: '/student/tickets/new', icon: RiAddLine },
       { name: 'Profile', href: '/student/profile', icon: RiUserLine },
     ],
     user: {

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug - Ticket Details Issue</title>
+</head>
+<body>
+    <h1>Debug Instructions</h1>
+    <p>To debug the ticket details issue:</p>
+    <ol>
+        <li>Open the browser to <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+        <li>Open browser console (F12)</li>
+        <li>Login with a student account</li>
+        <li>Navigate to Student Tickets</li>
+        <li>Click the three-dot menu for any ticket</li>
+        <li>Click "View Details"</li>
+        <li>Check the console logs for debugging information</li>
+    </ol>
+    
+    <h2>Expected Console Output</h2>
+    <pre>
+=== StudentTicketDetail Component Rendered ===
+🔐 Access token present: true/false
+📍 Raw params object: {...}
+📍 Raw ticketId from params: "1"
+📍 Parsed ticketIdNumber: 1
+🔍 Calling useTicket with ID: 1
+🪝 useTicket hook called with ID: 1
+🪝 useTicket queryFn executing for ID: 1
+🌐 API: getTicket called with ID: 1
+🌐 API: Making request to: /tickets/1/
+    </pre>
+    
+    <h2>Common Issues to Check</h2>
+    <ul>
+        <li>Access token missing → Login required</li>
+        <li>Ticket ID is undefined → Navigation issue</li>
+        <li>API call failing → Network/backend issue</li>
+        <li>Component not rendering ticket data → State management issue</li>
+    </ul>
+</body>
+</html>

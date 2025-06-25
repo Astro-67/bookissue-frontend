@@ -13,11 +13,8 @@ function AuthenticatedApp() {
   const pathname = router.location.pathname
   const { isAuthenticated, isLoading, user } = useAuth()
 
-  console.log('AuthenticatedApp:', { pathname, isAuthenticated, isLoading, user: user?.email || 'none' });
-
   // Show loading spinner while checking authentication
   if (isLoading) {
-    console.log('Showing loading spinner');
     return <LoadingSpinner />
   }
 
@@ -26,15 +23,12 @@ function AuthenticatedApp() {
   
   // If user is not authenticated and not on auth page, redirect to login
   if (!isAuthenticated && !isAuthPage) {
-    console.log('Not authenticated, redirecting to login');
     window.location.href = '/login'
     return <LoadingSpinner />
   }
 
   // If user is authenticated and has user data but on auth page, redirect to dashboard
-  // If user is authenticated and has user data but on auth page, redirect to dashboard
   if (isAuthenticated && user && (pathname === '/login' || pathname === '/')) {
-    console.log('Authenticated user on auth page, redirecting to dashboard');
     window.location.href = `/${user.role}/dashboard`
     return <LoadingSpinner />
   }
