@@ -151,11 +151,6 @@ const ICTTicketsList: React.FC = () => {
       )
     },
     {
-      title: 'Created',
-      key: 'created_at' as keyof Ticket,
-      render: (_: any, ticket: Ticket) => new Date(ticket.created_at).toLocaleDateString()
-    },
-    {
       title: 'Actions',
       key: 'id' as keyof Ticket,
       render: (_: any, ticket: Ticket) => (
