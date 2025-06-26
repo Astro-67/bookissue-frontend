@@ -14,7 +14,18 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
-  
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: true, // Refetch when user comes back to tab
+      refetchOnMount: true, // Refetch when component mounts
+      refetchOnReconnect: true, // Refetch when internet connection is restored
+      retry: 1, // Retry failed requests once
+      staleTime: 0, // Consider data stale immediately for real-time feel
+    },
+    mutations: {
+      retry: 1, // Retry failed mutations once
+    },
+  },
 });
 
 

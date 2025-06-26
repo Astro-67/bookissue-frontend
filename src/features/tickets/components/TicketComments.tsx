@@ -3,9 +3,10 @@ import {
   RiSendPlaneLine, 
   RiUserLine,
   RiTimeLine,
-  RiMessageLine 
+  RiMessageLine,
+  RiRefreshLine 
 } from 'react-icons/ri';
-import { useTicketComments, useCreateComment, useTicket } from '../../../hooks/api';
+import { useRealTimeComments, useCreateComment, useTicket } from '../../../hooks/api';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { Comment } from '../../../types/api';
 
@@ -15,7 +16,7 @@ interface TicketCommentsProps {
 
 const TicketComments: React.FC<TicketCommentsProps> = ({ ticketId }) => {
   const { user } = useAuth();
-  const { data: commentsData, isLoading, error } = useTicketComments(ticketId);
+  const { data: commentsData, isLoading, error, isUpdating } = useRealTimeComments(ticketId);
   const { data: ticket } = useTicket(ticketId);
   
   const commentsEndRef = React.useRef<HTMLDivElement>(null);
@@ -104,7 +105,7 @@ const TicketComments: React.FC<TicketCommentsProps> = ({ ticketId }) => {
         scrollToBottom();
       }, 100);
     } catch (error) {
-      console.error('Failed to create comment:', error);
+      // Error handling is now done in the mutation hooks with toast
     } finally {
       setIsSubmitting(false);
     }
@@ -140,10 +141,18 @@ const TicketComments: React.FC<TicketCommentsProps> = ({ ticketId }) => {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-medium text-gray-900 flex items-center">
-        <RiMessageLine className="w-5 h-5 mr-2" />
-        Comments ({comments.length})
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium text-gray-900 flex items-center">
+          <RiMessageLine className="w-5 h-5 mr-2" />
+          Comments ({comments.length})
+        </h3>
+        {isUpdating && (
+          <div className="flex items-center text-sm text-blue-600">
+            <RiRefreshLine className="w-4 h-4 mr-1 animate-spin" />
+            <span>Updating...</span>
+          </div>
+        )}
+      </div>
 
       {/* Comments List */}
       <div className="space-y-4 max-h-96 overflow-y-auto bg-gray-50 rounded-lg p-4">

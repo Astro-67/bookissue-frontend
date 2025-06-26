@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTickets, useAssignTicket, useUpdateTicket } from '../../../hooks/api';
+import { useRealTimeTickets, useAssignTicket, useUpdateTicket, useRealTimeNotifications } from '../../../hooks/api';
 import { useAuth } from '../../../contexts/AuthContext';
 import Table from '../../../ui/Table';
 import { Link } from '@tanstack/react-router';
@@ -9,7 +9,8 @@ import {
   RiCheckboxCircleLine,
   RiTimeLine,
   RiAlertLine,
-  RiChat1Line
+  RiChat1Line,
+  RiRefreshLine
 } from 'react-icons/ri';
 import type { Ticket } from '../../../types/api';
 
@@ -20,9 +21,12 @@ const ICTTicketsList: React.FC = () => {
     search: ''
   });
   
-  const { data: ticketsData, isLoading, error, refetch } = useTickets(filters);
+  const { data: ticketsData, isLoading, error, isUpdating, lastUpdated } = useRealTimeTickets(filters);
   const assignTicketMutation = useAssignTicket();
   const updateTicketMutation = useUpdateTicket();
+  
+  // Enable real-time notifications for ICT users
+  useRealTimeNotifications();
 
   // Handle both array and paginated response
   const tickets = React.useMemo(() => {
@@ -83,9 +87,9 @@ const ICTTicketsList: React.FC = () => {
         data: { status: 'IN_PROGRESS' }
       });
       
-      refetch();
+      // No need to manually refetch - real-time updates will handle it
     } catch (error) {
-      console.error('Failed to assign ticket:', error);
+      // Error handling is now done in the mutation hooks with toast
     }
   };
 
@@ -95,9 +99,9 @@ const ICTTicketsList: React.FC = () => {
         ticketId,
         data: { status: 'RESOLVED' }
       });
-      refetch();
+      // No need to manually refetch - real-time updates will handle it
     } catch (error) {
-      console.error('Failed to resolve ticket:', error);
+      // Error handling is now done in the mutation hooks with toast
     }
   };
 
@@ -211,7 +215,20 @@ const ICTTicketsList: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">All Support Tickets</h1>
+        <div className="flex items-center space-x-3">
+          <h1 className="text-2xl font-bold text-gray-900">All Support Tickets</h1>
+          {isUpdating && (
+            <div className="flex items-center text-sm text-blue-600">
+              <RiRefreshLine className="w-4 h-4 mr-1 animate-spin" />
+              <span>Updating...</span>
+            </div>
+          )}
+        </div>
+        {lastUpdated && (
+          <div className="text-xs text-gray-500">
+            Last updated: {new Date(lastUpdated).toLocaleTimeString()}
+          </div>
+        )}
       </div>
 
       {/* Filters */}
