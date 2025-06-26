@@ -4,7 +4,6 @@ import type { Ticket } from '../../../types/api';
 import Table, { type TableColumn } from '../../../ui/Table';
 import Modal from '../../../ui/Modal';
 import CreateTicketForm from './CreateTicketForm';
-import { createPortal } from 'react-dom';
 import { 
   RiAddLine, 
   RiTimeLine,
@@ -23,7 +22,6 @@ interface ActionsDropdownProps {
 
 const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -40,14 +38,6 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
   const toggleDropdown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (!isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.right + window.scrollX - 176 // 176px is dropdown width (44 * 4)
-      });
-    }
     setIsOpen(!isOpen);
   };
 
@@ -63,22 +53,16 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
       }
     };
 
-    const handleScroll = () => {
-      setIsOpen(false);
-    };
-
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      window.addEventListener('scroll', handleScroll, true);
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
-        window.removeEventListener('scroll', handleScroll, true);
       };
     }
   }, [isOpen]);
 
   return (
-    <>
+    <div className="relative">
       <button
         ref={buttonRef}
         onClick={toggleDropdown}
@@ -89,14 +73,10 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
         <RiMore2Line className="w-4 h-4" />
       </button>
 
-      {isOpen && createPortal(
+      {isOpen && (
         <div
           ref={dropdownRef}
-          className="fixed z-[9999] w-44 bg-white border border-gray-200 divide-y divide-gray-100 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
-          style={{
-            top: `${position.top}px`,
-            left: `${position.left}px`,
-          }}
+          className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50"
         >
           <div className="py-1">
             <button
@@ -106,10 +86,10 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
                 handleView();
                 setIsOpen(false);
               }}
-              className="group flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 first:rounded-t-lg"
+              className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
               type="button"
             >
-              <RiEyeLine className="w-4 h-4 mr-3 text-blue-500 group-hover:text-blue-600" />
+              <RiEyeLine className="w-4 h-4 mr-2 text-blue-500" />
               View Details
             </button>
             <button
@@ -118,17 +98,16 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
                 e.stopPropagation();
                 handleEdit();
               }}
-              className="group flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-150 last:rounded-b-lg"
+              className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
               type="button"
             >
-              <RiEditLine className="w-4 h-4 mr-3 text-green-500 group-hover:text-green-600" />
+              <RiEditLine className="w-4 h-4 mr-2 text-green-500" />
               Edit Issue
             </button>
           </div>
-        </div>,
-        document.body
+        </div>
       )}
-    </>
+    </div>
   );
 };
 
@@ -275,8 +254,12 @@ const StudentTicketsList: React.FC = () => {
     {
       key: 'actions',
       title: 'Actions',
-      width: '60px',
-      render: (_, ticket) => <ActionsDropdown ticket={ticket} />,
+      width: '80px',
+      render: (_, ticket) => (
+        <div className="relative">
+          <ActionsDropdown ticket={ticket} />
+        </div>
+      ),
     },
   ];
 
@@ -343,19 +326,23 @@ const StudentTicketsList: React.FC = () => {
       </div>
 
       {/* Tickets Table */}
-      <Table
-        data={sortedTickets}
-        columns={columns}
-        sortKey={sortKey}
-        sortDirection={sortDirection}
-        onSort={handleSort}
-        loading={isLoading}
-        emptyMessage={
-          searchTerm || statusFilter 
-            ? 'No issues found matching your criteria'
-            : 'No issues found. Create your first issue to get started.'
-        }
-      />
+      <div className="bg-white shadow-sm rounded-lg border border-gray-200">
+        <div className="overflow-x-auto">
+          <Table
+            data={sortedTickets}
+            columns={columns}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            loading={isLoading}
+            emptyMessage={
+              searchTerm || statusFilter 
+                ? 'No issues found matching your criteria'
+                : 'No issues found. Create your first issue to get started.'
+            }
+          />
+        </div>
+      </div>
 
       {/* Results count */}
       {sortedTickets.length > 0 && (

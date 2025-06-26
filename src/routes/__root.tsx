@@ -1,12 +1,10 @@
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Outlet, createRootRoute, useRouterState } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { SharedLayout } from '../ui/SharedLayout'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
 import LoadingSpinner from '../ui/LoadingSpinner'
+import { SharedLayout } from '../ui/SharedLayout'
 
-const queryClient = new QueryClient()
 
 function AuthenticatedApp() {
   const router = useRouterState()
@@ -62,11 +60,9 @@ function AuthenticatedApp() {
 
 function RootComponent() {
   return (
-    <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <AuthenticatedApp />
       </AuthProvider>
-    </QueryClientProvider>
   )
 }
 
