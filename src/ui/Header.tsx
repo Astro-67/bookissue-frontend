@@ -40,15 +40,16 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center space-x-4">
           <button
             onClick={onMobileMenuToggle}
-            className="lg:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+            className="lg:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 active:scale-95"
+            aria-label="Open menu"
           >
             <RiMenuLine className="h-6 w-6" />
           </button>
-          <div>
-            <h1 className="text-xl font-semibold text-gray-900">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold text-gray-900 truncate">
               {title}
             </h1>
-            <p className="text-sm text-gray-500">Welcome back, {userName}</p>
+            <p className="text-sm text-gray-500 truncate hidden sm:block">Welcome back, {userName}</p>
           </div>
         </div>
 

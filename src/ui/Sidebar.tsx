@@ -33,6 +33,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isActive,
   onSignOut
 }) => {
+  
+  // Auto-close sidebar on mobile after navigation
+  const handleNavigationClick = () => {
+    if (window.innerWidth < 1024) { // lg breakpoint
+      onSidebarClose()
+    }
+  }
+
   return (
     <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
       sidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -63,6 +71,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={handleNavigationClick}
                 className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                   active
                     ? 'bg-blue-600 text-white shadow-sm'
