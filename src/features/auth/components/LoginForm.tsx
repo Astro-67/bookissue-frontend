@@ -150,7 +150,7 @@ export const LoginForm: React.FC = () => {
             </div>
           )}
 
-          <div className="mt-6">
+          <div className="mt-6 ">
             <div className="text-center text-sm text-gray-600">
               Test Credentials:
             </div>
@@ -158,9 +158,6 @@ export const LoginForm: React.FC = () => {
               <div>Student: student1@gmail.com / password123</div>
               <div>Staff: staff1@gmail.com / password123</div>
               <div>ICT: ict1@gmail.com / password123</div>
-              <div className="text-xs text-gray-400 mt-1">
-                (Make sure your backend is running on port 8000)
-              </div>
             </div>
           </div>
         </form>

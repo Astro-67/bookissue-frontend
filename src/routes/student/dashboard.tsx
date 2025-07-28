@@ -116,7 +116,7 @@ function RouteComponent() {
   return (
     <div className="space-y-6">
       {/* Welcome Card */}
-      <div className="bg-gradient-to-r from-indigo-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+      <div className="bg-blue-500 rounded-sm shadow-lg p-6 text-white">
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold mb-2">
