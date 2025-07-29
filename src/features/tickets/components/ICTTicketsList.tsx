@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRealTimeTickets, useAssignTicket, useUpdateTicket, useRealTimeNotifications } from '../../../hooks/api';
+import { useRealTimeTickets, useAssignTicket, useUpdateTicket, useRealTimeNotifications, usePrefetchTicket } from '../../../hooks/api';
 import { useAuth } from '../../../contexts/AuthContext';
 import Table from '../../../ui/Table';
 import { Link } from '@tanstack/react-router';
@@ -24,6 +24,7 @@ const ICTTicketsList: React.FC = () => {
   const { data: ticketsData, isLoading, error, isUpdating, lastUpdated } = useRealTimeTickets(filters);
   const assignTicketMutation = useAssignTicket();
   const updateTicketMutation = useUpdateTicket();
+  const prefetchTicket = usePrefetchTicket();
   
   // Enable real-time notifications for ICT users
   useRealTimeNotifications();
@@ -158,6 +159,7 @@ const ICTTicketsList: React.FC = () => {
           <Link
             to="/ict/ticket/$ticketId"
             params={{ ticketId: ticket.id.toString() }}
+            onMouseEnter={() => prefetchTicket(ticket.id)}
             className="text-blue-600 hover:text-blue-800 p-1"
             title="View Details"
           >

@@ -99,9 +99,11 @@ export const useTickets = (params?: {
   return useQuery({
     queryKey: ['tickets', params],
     queryFn: () => ticketsApi.getTickets(params),
-    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
-    refetchIntervalInBackground: true, // Continue refetching when tab is not focused
-    staleTime: 0, // Always consider data stale to ensure fresh updates
+    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes (formerly cacheTime)
+    refetchOnWindowFocus: true, // Refetch when user comes back to the tab
+    refetchOnMount: false, // Don't refetch on mount if data is still fresh
+    placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
   });
 };
 
@@ -110,10 +112,24 @@ export const useTicket = (id: number) => {
     queryKey: ['tickets', id],
     queryFn: () => ticketsApi.getTicket(id),
     enabled: !!id,
-    refetchInterval: 15000, // Refetch every 15 seconds for ticket details
-    refetchIntervalInBackground: true,
-    staleTime: 0,
+    staleTime: 1 * 60 * 1000, // Consider fresh for 1 minute
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window gains focus
+    refetchOnMount: false, // Don't refetch on mount if data is fresh
   });
+};
+
+// Prefetch helper for ticket details on hover
+export const usePrefetchTicket = () => {
+  const queryClient = useQueryClient();
+  
+  return (id: number) => {
+    queryClient.prefetchQuery({
+      queryKey: ['tickets', id],
+      queryFn: () => ticketsApi.getTicket(id),
+      staleTime: 1 * 60 * 1000,
+    });
+  };
 };
 
 export const useCreateTicket = () => {
@@ -122,10 +138,8 @@ export const useCreateTicket = () => {
   return useMutation({
     mutationFn: ticketsApi.createTicket,
     onSuccess: () => {
-      // Invalidate all ticket queries to ensure immediate updates across all views
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      // Force refetch immediately
-      queryClient.refetchQueries({ queryKey: ['tickets'] });
+      // Just invalidate ticket list queries, don't force refetch immediately
+      queryClient.invalidateQueries({ queryKey: ['tickets'], type: 'all' });
       toast.success('Ticket created successfully!');
     },
     onError: (error: any) => {
@@ -140,12 +154,18 @@ export const useUpdateTicket = () => {
   return useMutation({
     mutationFn: ({ ticketId, data }: { ticketId: number; data: any }) => 
       ticketsApi.updateTicket(ticketId, data),
-    onSuccess: (_, variables) => {
-      // Invalidate and refetch all ticket queries for immediate updates
-      queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      queryClient.invalidateQueries({ queryKey: ['tickets', variables.ticketId] });
-      queryClient.refetchQueries({ queryKey: ['tickets'] });
-      queryClient.refetchQueries({ queryKey: ['tickets', variables.ticketId] });
+    onSuccess: (updatedTicket, variables) => {
+      // Update the specific ticket in cache if we get updated data back
+      if (updatedTicket) {
+        queryClient.setQueryData(['tickets', variables.ticketId], updatedTicket);
+      }
+      
+      // Invalidate ticket lists but keep cached data until new data arrives
+      queryClient.invalidateQueries({ 
+        queryKey: ['tickets'], 
+        refetchType: 'none' // Don't refetch immediately, just mark as stale
+      });
+      
       toast.success('Ticket updated successfully!');
     },
     onError: (error: any) => {

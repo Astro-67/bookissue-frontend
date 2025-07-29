@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useTickets } from '../../../hooks/api';
+import { Link } from '@tanstack/react-router';
+import { useTickets, usePrefetchTicket } from '../../../hooks/api';
 import type { Ticket } from '../../../types/api';
 import Table, { type TableColumn } from '../../../ui/Table';
 import Modal from '../../../ui/Modal';
@@ -26,15 +27,15 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
-
-  const handleView = () => {
-    const targetUrl = `/staff/ticket/${ticket.id}`;
-    window.location.href = targetUrl;
-  };
+  const prefetchTicket = usePrefetchTicket();
 
   const handleEdit = () => {
     // TODO: Implement edit functionality
     setIsOpen(false);
+  };
+
+  const handlePrefetch = () => {
+    prefetchTicket(ticket.id);
   };
 
   const toggleDropdown = (e: React.MouseEvent) => {
@@ -95,13 +96,16 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
           }}
         >
           <div className="py-1">
-            <button
-              onClick={handleView}
+            <Link
+              to="/staff/ticket/$ticketId"
+              params={{ ticketId: ticket.id.toString() }}
+              onMouseEnter={handlePrefetch}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+              onClick={() => setIsOpen(false)}
             >
               <RiEyeLine className="w-4 h-4 mr-3" />
               View Details
-            </button>
+            </Link>
             <button
               onClick={handleEdit}
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"

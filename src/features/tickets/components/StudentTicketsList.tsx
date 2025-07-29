@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useTickets } from '../../../hooks/api';
+import { Link } from '@tanstack/react-router';
+import { useTickets, usePrefetchTicket } from '../../../hooks/api';
 import type { Ticket } from '../../../types/api';
 import Table, { type TableColumn } from '../../../ui/Table';
 import Modal from '../../../ui/Modal';
@@ -24,11 +25,7 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
-
-  const handleView = () => {
-    const targetUrl = `/student/tickets/${ticket.id}`;
-    window.location.href = targetUrl;
-  };
+  const prefetchTicket = usePrefetchTicket();
 
   const handleEdit = () => {
     // TODO: Implement edit functionality
@@ -79,19 +76,16 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
           className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50"
         >
           <div className="py-1">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleView();
-                setIsOpen(false);
-              }}
+            <Link
+              to="/student/tickets/$ticketId"
+              params={{ ticketId: ticket.id.toString() }}
+              onMouseEnter={() => prefetchTicket(ticket.id)}
+              onClick={() => setIsOpen(false)}
               className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              type="button"
             >
               <RiEyeLine className="w-4 h-4 mr-2 text-blue-500" />
               View Details
-            </button>
+            </Link>
             <button
               onClick={(e) => {
                 e.preventDefault();
