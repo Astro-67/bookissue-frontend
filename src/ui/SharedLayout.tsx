@@ -7,9 +7,7 @@ import {
   RiTeamLine, 
   RiBookLine, 
   RiBarChartBoxLine, 
-  RiAlertLine, 
   RiGroupLine, 
-  RiSettingsLine
 } from 'react-icons/ri'
 import { Header } from './Header'
 import { Footer } from './Footer'
@@ -56,10 +54,7 @@ const roleConfig = {
     navigation: [
       { name: 'Dashboard', href: '/ict/dashboard', icon: RiDashboardLine },
       { name: 'All Issues', href: '/ict/tickets', icon: RiTicketLine },
-      { name: 'Critical Issues', href: '/ict/tickets/critical', icon: RiAlertLine },
       { name: 'User Management', href: '/ict/users', icon: RiGroupLine },
-      { name: 'System Settings', href: '/ict/settings', icon: RiSettingsLine },
-      { name: 'Analytics', href: '/ict/analytics', icon: RiBarChartBoxLine },
     ],
     user: {
       name: 'Mike Taylor',
