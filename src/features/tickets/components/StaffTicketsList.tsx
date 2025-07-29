@@ -28,7 +28,7 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket }) => {
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   const handleView = () => {
-    const targetUrl = `/staff/tickets/${ticket.id}`;
+    const targetUrl = `/staff/ticket/${ticket.id}`;
     window.location.href = targetUrl;
   };
 

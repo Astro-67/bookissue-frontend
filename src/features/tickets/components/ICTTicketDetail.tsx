@@ -192,11 +192,6 @@ const ICTTicketDetail: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-medium text-gray-900 mb-3">Screenshot</h3>
                     <div className="bg-gray-50 rounded-lg p-4">
-                      {(() => {
-                        console.log('ICTTicketDetail - ticket.screenshot:', ticket.screenshot);
-                        console.log('ICTTicketDetail - getMediaUrl result:', getMediaUrl(ticket.screenshot));
-                        return null;
-                      })()}
                       <img 
                         src={getMediaUrl(ticket.screenshot) || ''} 
                         alt="Issue screenshot"
@@ -206,8 +201,7 @@ const ICTTicketDetail: React.FC = () => {
                           if (fullUrl) window.open(fullUrl, '_blank');
                         }}
                         onError={(e) => {
-                          console.error('ICTTicketDetail - Failed to load image:', ticket.screenshot);
-                          console.error('ICTTicketDetail - Attempted URL:', getMediaUrl(ticket.screenshot));
+                          console.error('Failed to load image:', ticket.screenshot);
                           e.currentTarget.style.display = 'none';
                         }}
                       />
