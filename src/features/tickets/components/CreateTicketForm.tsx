@@ -13,6 +13,7 @@ const CreateTicketForm: React.FC<CreateTicketFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState<CreateTicketData>({
     title: '',
     description: '',
+    screenshot: undefined,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -46,12 +47,24 @@ const CreateTicketForm: React.FC<CreateTicketFormProps> = ({ onSuccess }) => {
     createTicketMutation.mutate(formData, {
       onSuccess: () => {
         // Reset form
-        setFormData({ title: '', description: '' });
+        setFormData({ title: '', description: '', screenshot: undefined });
         setErrors({});
         onSuccess?.();
       },
-      onError: (error) => {
+      onError: (error: any) => {
         console.error('Failed to create ticket:', error);
+        console.error('Error response:', error?.response?.data);
+        
+        // Handle validation errors
+        if (error?.response?.data) {
+          const serverErrors = error.response.data;
+          if (typeof serverErrors === 'object') {
+            setErrors(prev => ({
+              ...prev,
+              ...serverErrors
+            }));
+          }
+        }
       },
     });
   };
@@ -72,15 +85,65 @@ const CreateTicketForm: React.FC<CreateTicketFormProps> = ({ onSuccess }) => {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    
+    if (!file) {
+      // File was cleared/removed
+      setFormData(prev => ({
+        ...prev,
+        screenshot: undefined
+      }));
+      return;
+    }
+    
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setErrors(prev => ({
+        ...prev,
+        screenshot: 'Please select a valid image file (JPEG, PNG, GIF, or WebP)'
+      }));
+      // Clear the file input
+      e.target.value = '';
+      return;
+    }
+    
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setErrors(prev => ({
+        ...prev,
+        screenshot: 'File size must be less than 5MB'
+      }));
+      // Clear the file input
+      e.target.value = '';
+      return;
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      screenshot: file
+    }));
+    
+    // Clear error if file is valid
+    if (errors.screenshot) {
+      setErrors(prev => ({
+        ...prev,
+        screenshot: ''
+      }));
+    }
+  };
+
   const handleCancel = () => {
     // Reset form
-    setFormData({ title: '', description: '' });
+    setFormData({ title: '', description: '', screenshot: undefined });
     setErrors({});
     onSuccess?.();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
       {/* Title Field */}
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
@@ -125,6 +188,36 @@ const CreateTicketForm: React.FC<CreateTicketFormProps> = ({ onSuccess }) => {
         {errors.description && (
           <p className="mt-1 text-sm text-red-600">{errors.description}</p>
         )}
+      </div>
+
+      {/* Screenshot Field */}
+      <div>
+        <label htmlFor="screenshot" className="block text-sm font-medium text-gray-700 mb-1">
+          Screenshot (Optional)
+        </label>
+        <input
+          type="file"
+          id="screenshot"
+          name="screenshot"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          onChange={handleFileChange}
+          className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            errors.screenshot 
+              ? 'border-red-300 focus:border-red-500' 
+              : 'border-gray-300 focus:border-blue-500'
+          }`}
+        />
+        {formData.screenshot && (
+          <p className="mt-1 text-sm text-green-600">
+            Selected: {formData.screenshot.name} ({(formData.screenshot.size / 1024 / 1024).toFixed(2)} MB)
+          </p>
+        )}
+        {errors.screenshot && (
+          <p className="mt-1 text-sm text-red-600">{errors.screenshot}</p>
+        )}
+        <p className="mt-1 text-xs text-gray-500">
+          Accepted formats: JPEG, PNG, GIF, WebP. Maximum size: 5MB
+        </p>
       </div>
 
       {/* Buttons */}

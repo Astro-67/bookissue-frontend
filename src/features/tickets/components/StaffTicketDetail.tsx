@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, Link } from '@tanstack/react-router';
 import { useTicket } from '../../../hooks/api';
 import TicketComments from './TicketComments';
+import { getMediaUrl } from '../../../utils/media';
 import { 
   RiArrowLeftLine,
   RiTimeLine,
@@ -124,6 +125,37 @@ const StaffTicketDetail: React.FC = () => {
                   <p className="text-gray-700 whitespace-pre-wrap">{ticket.description}</p>
                 </div>
               </div>
+
+              {/* Screenshot */}
+              {ticket.screenshot && (
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">Screenshot</h3>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    {(() => {
+                      console.log('StaffTicketDetail - ticket.screenshot:', ticket.screenshot);
+                      console.log('StaffTicketDetail - getMediaUrl result:', getMediaUrl(ticket.screenshot));
+                      return null;
+                    })()}
+                    <img 
+                      src={getMediaUrl(ticket.screenshot) || ''} 
+                      alt="Issue screenshot"
+                      className="max-w-full h-auto rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+                      onClick={() => {
+                        const fullUrl = getMediaUrl(ticket.screenshot);
+                        if (fullUrl) window.open(fullUrl, '_blank');
+                      }}
+                      onError={(e) => {
+                        console.error('StaffTicketDetail - Failed to load image:', ticket.screenshot);
+                        console.error('StaffTicketDetail - Attempted URL:', getMediaUrl(ticket.screenshot));
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <p className="text-xs text-gray-500 mt-2 text-center">
+                      Click to view full size
+                    </p>
+                  </div>
+                </div>
+              )}
               
               {/* Comments Section */}
               <div className="border-t border-gray-200 pt-6">

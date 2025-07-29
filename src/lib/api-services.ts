@@ -63,8 +63,24 @@ export const ticketsApi = {  getTickets: async (params?: {
   createTicket: async (ticketData: {
     title: string;
     description: string;
+    screenshot?: File;
   }) => {
-    const response = await api.post('/tickets/', ticketData);
+    // Always use FormData to handle both file and non-file cases consistently
+    const formData = new FormData();
+    formData.append('title', ticketData.title);
+    formData.append('description', ticketData.description);
+    
+    // Only append screenshot if it exists and is a File
+    if (ticketData.screenshot && ticketData.screenshot instanceof File) {
+      formData.append('screenshot', ticketData.screenshot);
+    }
+    
+    // Configure request with explicit headers
+    const config = {
+      transformRequest: [(data: any) => data], // Don't transform FormData
+    };
+    
+    const response = await api.post('/tickets/', formData, config);
     return response.data;
   },
   

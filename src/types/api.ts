@@ -54,6 +54,7 @@ export interface Ticket {
   id: number;
   title: string;
   description: string;
+  screenshot?: string;
   status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
   created_by: User;
   assigned_to: User | null;
@@ -66,6 +67,7 @@ export interface Ticket {
 export interface CreateTicketData {
   title: string;
   description: string;
+  screenshot?: File;
 }
 
 export interface UpdateTicketData {
