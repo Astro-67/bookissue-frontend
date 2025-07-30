@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link } from '@tanstack/react-router';
+import { useParams, Link, useSearch } from '@tanstack/react-router';
 import { useTicket, useAssignTicket, useUpdateTicket } from '../../../hooks/api';
 import { useAuth } from '../../../contexts/AuthContext';
 import TicketComments from './TicketComments';
@@ -19,6 +19,25 @@ const ICTTicketDetail: React.FC = () => {
   const params = useParams({ from: '/ict/ticket/$ticketId' });
   const { ticketId } = params;
   const { user } = useAuth();
+  const search = useSearch({ from: '/ict/ticket/$ticketId' }) as any;
+  
+  // Determine the back URL based on where user came from
+  const getBackUrl = () => {
+    // Check if there's a returnTo parameter in the URL
+    if (search?.returnTo) {
+      return search.returnTo as string;
+    }
+    // Default to all tickets if no returnTo specified
+    return '/ict/tickets';
+  };
+
+  const getBackLabel = () => {
+    const backUrl = getBackUrl();
+    if (backUrl.includes('assigned-tickets')) {
+      return 'Back to My Assigned';
+    }
+    return 'Back to All Tickets';
+  };
   
   if (!ticketId) {
     return (
@@ -147,11 +166,11 @@ const ICTTicketDetail: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link
-            to="/ict/tickets"
+            to={getBackUrl()}
             className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
           >
             <RiArrowLeftLine className="w-4 h-4 mr-1" />
-            Back to All Tickets
+            {getBackLabel()}
           </Link>
         </div>
       </div>
