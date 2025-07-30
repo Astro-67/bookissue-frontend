@@ -66,14 +66,27 @@ function SuperAdminUsers() {
 
   const handleUpdateUser = async (userData: Partial<User>) => {
     if (!editingUser) return
+    
+    // Clean the user data - remove empty strings and undefined values
+    const cleanedUserData = Object.entries(userData).reduce((acc, [key, value]) => {
+      // Keep the value if it's not an empty string, null, or undefined
+      // For boolean values (like is_active), keep them even if false
+      if (value !== '' && value !== null && value !== undefined) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as any);
+    
     try {
+      console.log('Updating user:', editingUser.id, 'with cleaned data:', cleanedUserData);
       await updateUserMutation.mutateAsync({
         userId: editingUser.id,
-        userData,
+        userData: cleanedUserData,
       })
       setShowEditModal(false)
       setEditingUser(null)
     } catch (error) {
+      console.error('Update user failed:', error);
       // Error is handled by the mutation
     }
   }

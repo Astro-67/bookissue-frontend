@@ -392,9 +392,34 @@ export const useCreateUser = () => {
       toast.success('User created successfully!');
     },
     onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || 
-                          error?.response?.data?.email?.[0] ||
-                          'Failed to create user. Please try again.';
+      console.error('Create user error:', error);
+      
+      // Handle different types of errors
+      let errorMessage = 'Failed to create user. Please try again.';
+      
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        
+        // Handle validation errors (field-specific)
+        if (errorData.email) {
+          errorMessage = `Email error: ${Array.isArray(errorData.email) ? errorData.email[0] : errorData.email}`;
+        } else if (errorData.username) {
+          errorMessage = `Username error: ${Array.isArray(errorData.username) ? errorData.username[0] : errorData.username}`;
+        } else if (errorData.password) {
+          errorMessage = `Password error: ${Array.isArray(errorData.password) ? errorData.password[0] : errorData.password}`;
+        } else if (errorData.non_field_errors) {
+          errorMessage = Array.isArray(errorData.non_field_errors) ? errorData.non_field_errors[0] : errorData.non_field_errors;
+        } else if (errorData.detail) {
+          errorMessage = errorData.detail;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast.error(errorMessage);
     },
   });
@@ -412,8 +437,32 @@ export const useUpdateUser = () => {
       toast.success('User updated successfully!');
     },
     onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || 
-                          'Failed to update user. Please try again.';
+      console.error('Update user error:', error);
+      
+      // Handle different types of errors
+      let errorMessage = 'Failed to update user. Please try again.';
+      
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        
+        // Handle validation errors (field-specific)
+        if (errorData.email) {
+          errorMessage = `Email error: ${Array.isArray(errorData.email) ? errorData.email[0] : errorData.email}`;
+        } else if (errorData.username) {
+          errorMessage = `Username error: ${Array.isArray(errorData.username) ? errorData.username[0] : errorData.username}`;
+        } else if (errorData.non_field_errors) {
+          errorMessage = Array.isArray(errorData.non_field_errors) ? errorData.non_field_errors[0] : errorData.non_field_errors;
+        } else if (errorData.detail) {
+          errorMessage = errorData.detail;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast.error(errorMessage);
     },
   });

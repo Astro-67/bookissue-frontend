@@ -217,6 +217,7 @@ export const usersApi = {
 
   updateUser: async (userId: number, userData: Partial<{
     email: string;
+    username: string;
     first_name: string;
     last_name: string;
     role: string;
@@ -225,8 +226,15 @@ export const usersApi = {
     department: string;
     is_active: boolean;
   }>) => {
-    const response = await api.patch(`/users/${userId}/`, userData);
-    return response.data;
+    console.log('API: Updating user', userId, 'with data:', userData);
+    try {
+      const response = await api.patch(`/users/${userId}/`, userData);
+      console.log('API: Update user response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('API: Update user error:', error);
+      throw error;
+    }
   },
 
   deleteUser: async (userId: number) => {
