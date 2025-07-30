@@ -8,8 +8,6 @@ import {
   RiBookLine, 
   RiBarChartBoxLine, 
   RiGroupLine,
-  RiSettings3Line,
-  RiShieldUserLine,
 } from 'react-icons/ri'
 import { Header } from './Header'
 import { Footer } from './Footer'
@@ -71,8 +69,6 @@ const roleConfig = {
       { name: 'Dashboard', href: '/super-admin/dashboard', icon: RiDashboardLine },
       { name: 'All Tickets', href: '/super-admin/tickets', icon: RiTicketLine },
       { name: 'User Management', href: '/super-admin/users', icon: RiGroupLine },
-      { name: 'System Settings', href: '/super-admin/settings', icon: RiSettings3Line },
-      { name: 'Admin Panel', href: '/super-admin/admin', icon: RiShieldUserLine },
     ],
     user: {
       name: 'System Administrator',

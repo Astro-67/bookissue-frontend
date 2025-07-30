@@ -2,13 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTickets, useUsers } from '../../hooks/api'
 import type { User } from '../../types/api'
-import { 
-  RiTicketLine, 
-  RiUserLine, 
-  RiGroupLine, 
-  RiShieldUserLine,
+import {
   RiBarChartBoxLine,
-  RiSettings3Line
+  RiGroupLine,
+  RiShieldUserLine,
+  RiTicketLine,
+  RiUserLine,
 } from 'react-icons/ri'
 
 function SuperAdminDashboard() {
@@ -61,12 +60,6 @@ function SuperAdminDashboard() {
       href: '/super-admin/reports',
       icon: RiBarChartBoxLine,
       description: 'View system analytics and reports',
-    },
-    {
-      name: 'System Settings',
-      href: '/super-admin/settings',
-      icon: RiSettings3Line,
-      description: 'Configure system-wide settings',
     },
   ]
 
