@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useAuth } from '../../contexts/AuthContext'
-import { useTickets } from '../../hooks/api'
+import { useTickets, useUsers } from '../../hooks/api'
+import type { User } from '../../types/api'
 import { 
   RiTicketLine, 
   RiUserLine, 
@@ -13,6 +14,7 @@ import {
 function SuperAdminDashboard() {
   const { user } = useAuth()
   const { data: tickets } = useTickets()
+  const { data: users } = useUsers()
 
   const stats = [
     {
@@ -22,20 +24,20 @@ function SuperAdminDashboard() {
       color: 'bg-blue-500',
     },
     {
-      name: 'Active Users',
-      value: '125', // This would come from a users API
+      name: 'Total Users',
+      value: users?.length || 0,
       icon: RiUserLine,
       color: 'bg-green-500',
     },
     {
       name: 'Staff Members',
-      value: '15', // This would come from a staff API
+      value: users?.filter((u: User) => ['staff', 'ict'].includes(u.role)).length || 0,
       icon: RiGroupLine,
       color: 'bg-purple-500',
     },
     {
-      name: 'System Health',
-      value: '99.9%',
+      name: 'Active Users',
+      value: users?.filter((u: User) => u.is_active).length || 0,
       icon: RiShieldUserLine,
       color: 'bg-emerald-500',
     },
@@ -52,13 +54,7 @@ function SuperAdminDashboard() {
       name: 'User Management',
       href: '/super-admin/users',
       icon: RiUserLine,
-      description: 'Add, edit, and manage user accounts',
-    },
-    {
-      name: 'Staff Management',
-      href: '/super-admin/staff',
-      icon: RiGroupLine,
-      description: 'Manage staff roles and permissions',
+      description: 'Manage all users: students, staff, ICT, and admins',
     },
     {
       name: 'System Reports',

@@ -36,6 +36,7 @@ import { Route as IctLayoutRouteImport } from './routes/ict/_layout'
 import { Route as StudentTicketsIndexRouteImport } from './routes/student/tickets/index'
 import { Route as StudentTicketsNewRouteImport } from './routes/student/tickets/new'
 import { Route as StudentTicketsTicketIdRouteImport } from './routes/student/tickets/$ticketId'
+import { Route as StaffTicketsAssignedRouteImport } from './routes/staff/tickets/assigned'
 import { Route as StaffTicketTicketIdRouteImport } from './routes/staff/ticket/$ticketId'
 import { Route as IctTicketsAssignedRouteImport } from './routes/ict/tickets/assigned'
 import { Route as IctTicketTicketIdRouteImport } from './routes/ict/ticket/$ticketId'
@@ -186,6 +187,11 @@ const StudentTicketsTicketIdRoute = StudentTicketsTicketIdRouteImport.update({
   path: '/$ticketId',
   getParentRoute: () => StudentTicketsRoute,
 } as any)
+const StaffTicketsAssignedRoute = StaffTicketsAssignedRouteImport.update({
+  id: '/assigned',
+  path: '/assigned',
+  getParentRoute: () => StaffTicketsRoute,
+} as any)
 const StaffTicketTicketIdRoute = StaffTicketTicketIdRouteImport.update({
   id: '/ticket/$ticketId',
   path: '/ticket/$ticketId',
@@ -214,7 +220,7 @@ export interface FileRoutesByFullPath {
   '/staff': typeof StaffLayoutRoute
   '/staff/assigned-tickets': typeof StaffAssignedTicketsRoute
   '/staff/dashboard': typeof StaffDashboardRoute
-  '/staff/tickets': typeof StaffTicketsRoute
+  '/staff/tickets': typeof StaffTicketsRouteWithChildren
   '/student': typeof StudentLayoutRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/profile': typeof StudentProfileRoute
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
   '/ict/tickets/assigned': typeof IctTicketsAssignedRoute
   '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
+  '/staff/tickets/assigned': typeof StaffTicketsAssignedRoute
   '/student/tickets/$ticketId': typeof StudentTicketsTicketIdRoute
   '/student/tickets/new': typeof StudentTicketsNewRoute
   '/student/tickets/': typeof StudentTicketsIndexRoute
@@ -244,7 +251,7 @@ export interface FileRoutesByTo {
   '/staff': typeof StaffLayoutRoute
   '/staff/assigned-tickets': typeof StaffAssignedTicketsRoute
   '/staff/dashboard': typeof StaffDashboardRoute
-  '/staff/tickets': typeof StaffTicketsRoute
+  '/staff/tickets': typeof StaffTicketsRouteWithChildren
   '/student': typeof StudentLayoutRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/profile': typeof StudentProfileRoute
@@ -257,6 +264,7 @@ export interface FileRoutesByTo {
   '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
   '/ict/tickets/assigned': typeof IctTicketsAssignedRoute
   '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
+  '/staff/tickets/assigned': typeof StaffTicketsAssignedRoute
   '/student/tickets/$ticketId': typeof StudentTicketsTicketIdRoute
   '/student/tickets/new': typeof StudentTicketsNewRoute
   '/student/tickets': typeof StudentTicketsIndexRoute
@@ -276,7 +284,7 @@ export interface FileRoutesById {
   '/staff/_layout': typeof StaffLayoutRoute
   '/staff/assigned-tickets': typeof StaffAssignedTicketsRoute
   '/staff/dashboard': typeof StaffDashboardRoute
-  '/staff/tickets': typeof StaffTicketsRoute
+  '/staff/tickets': typeof StaffTicketsRouteWithChildren
   '/student': typeof StudentRouteWithChildren
   '/student/_layout': typeof StudentLayoutRoute
   '/student/dashboard': typeof StudentDashboardRoute
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
   '/ict/tickets/assigned': typeof IctTicketsAssignedRoute
   '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
+  '/staff/tickets/assigned': typeof StaffTicketsAssignedRoute
   '/student/tickets/$ticketId': typeof StudentTicketsTicketIdRoute
   '/student/tickets/new': typeof StudentTicketsNewRoute
   '/student/tickets/': typeof StudentTicketsIndexRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/ict/ticket/$ticketId'
     | '/ict/tickets/assigned'
     | '/staff/ticket/$ticketId'
+    | '/staff/tickets/assigned'
     | '/student/tickets/$ticketId'
     | '/student/tickets/new'
     | '/student/tickets/'
@@ -353,6 +363,7 @@ export interface FileRouteTypes {
     | '/ict/ticket/$ticketId'
     | '/ict/tickets/assigned'
     | '/staff/ticket/$ticketId'
+    | '/staff/tickets/assigned'
     | '/student/tickets/$ticketId'
     | '/student/tickets/new'
     | '/student/tickets'
@@ -387,6 +398,7 @@ export interface FileRouteTypes {
     | '/ict/ticket/$ticketId'
     | '/ict/tickets/assigned'
     | '/staff/ticket/$ticketId'
+    | '/staff/tickets/assigned'
     | '/student/tickets/$ticketId'
     | '/student/tickets/new'
     | '/student/tickets/'
@@ -607,6 +619,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentTicketsTicketIdRouteImport
       parentRoute: typeof StudentTicketsRoute
     }
+    '/staff/tickets/assigned': {
+      id: '/staff/tickets/assigned'
+      path: '/assigned'
+      fullPath: '/staff/tickets/assigned'
+      preLoaderRoute: typeof StaffTicketsAssignedRouteImport
+      parentRoute: typeof StaffTicketsRoute
+    }
     '/staff/ticket/$ticketId': {
       id: '/staff/ticket/$ticketId'
       path: '/ticket/$ticketId'
@@ -663,11 +682,23 @@ const IctRouteChildren: IctRouteChildren = {
 
 const IctRouteWithChildren = IctRoute._addFileChildren(IctRouteChildren)
 
+interface StaffTicketsRouteChildren {
+  StaffTicketsAssignedRoute: typeof StaffTicketsAssignedRoute
+}
+
+const StaffTicketsRouteChildren: StaffTicketsRouteChildren = {
+  StaffTicketsAssignedRoute: StaffTicketsAssignedRoute,
+}
+
+const StaffTicketsRouteWithChildren = StaffTicketsRoute._addFileChildren(
+  StaffTicketsRouteChildren,
+)
+
 interface StaffRouteChildren {
   StaffLayoutRoute: typeof StaffLayoutRoute
   StaffAssignedTicketsRoute: typeof StaffAssignedTicketsRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
-  StaffTicketsRoute: typeof StaffTicketsRoute
+  StaffTicketsRoute: typeof StaffTicketsRouteWithChildren
   StaffTicketTicketIdRoute: typeof StaffTicketTicketIdRoute
 }
 
@@ -675,7 +706,7 @@ const StaffRouteChildren: StaffRouteChildren = {
   StaffLayoutRoute: StaffLayoutRoute,
   StaffAssignedTicketsRoute: StaffAssignedTicketsRoute,
   StaffDashboardRoute: StaffDashboardRoute,
-  StaffTicketsRoute: StaffTicketsRoute,
+  StaffTicketsRoute: StaffTicketsRouteWithChildren,
   StaffTicketTicketIdRoute: StaffTicketTicketIdRoute,
 }
 

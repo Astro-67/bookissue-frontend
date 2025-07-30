@@ -187,6 +187,59 @@ export const ticketsApi = {  getTickets: async (params?: {
   },
 };
 
+// Users management API (for admin)
+export const usersApi = {
+  getUsers: async (params?: {
+    role?: string;
+    department?: string;
+    is_active?: boolean;
+    search?: string;
+  }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.role) searchParams.set('role', params.role);
+    if (params?.department) searchParams.set('department', params.department);
+    if (params?.is_active !== undefined) searchParams.set('is_active', params.is_active.toString());
+    if (params?.search) searchParams.set('search', params.search);
+    
+    const response = await api.get(`/users/?${searchParams.toString()}`);
+    return response.data;
+  },
+
+  getUser: async (userId: number) => {
+    const response = await api.get(`/users/${userId}/`);
+    return response.data;
+  },
+
+  createUser: async (userData: RegisterData) => {
+    const response = await api.post('/users/create/', userData);
+    return response.data;
+  },
+
+  updateUser: async (userId: number, userData: Partial<{
+    email: string;
+    first_name: string;
+    last_name: string;
+    role: string;
+    phone_number: string;
+    student_id: string;
+    department: string;
+    is_active: boolean;
+  }>) => {
+    const response = await api.patch(`/users/${userId}/`, userData);
+    return response.data;
+  },
+
+  deleteUser: async (userId: number) => {
+    const response = await api.delete(`/users/${userId}/`);
+    return response.data;
+  },
+
+  getUserStats: async () => {
+    const response = await api.get('/users/stats/');
+    return response.data;
+  },
+};
+
 // Comments API
 export const commentsApi = {
   getTicketComments: async (ticketId: number) => {
@@ -224,4 +277,5 @@ export default {
   auth: authApi,
   tickets: ticketsApi,
   comments: commentsApi,
+  users: usersApi,
 };

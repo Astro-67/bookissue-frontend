@@ -71,7 +71,6 @@ const roleConfig = {
       { name: 'Dashboard', href: '/super-admin/dashboard', icon: RiDashboardLine },
       { name: 'All Tickets', href: '/super-admin/tickets', icon: RiTicketLine },
       { name: 'User Management', href: '/super-admin/users', icon: RiGroupLine },
-      { name: 'Staff Management', href: '/super-admin/staff', icon: RiTeamLine },
       { name: 'System Settings', href: '/super-admin/settings', icon: RiSettings3Line },
       { name: 'Admin Panel', href: '/super-admin/admin', icon: RiShieldUserLine },
     ],

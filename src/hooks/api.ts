@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { authApi, ticketsApi, commentsApi } from '../lib/api-services';
+import { authApi, ticketsApi, commentsApi, usersApi } from '../lib/api-services';
 
 // Auth hooks
 export const useLogin = () => {
@@ -358,4 +358,88 @@ export const useRealTimeNotifications = () => {
 
     return unsubscribe;
   }, [queryClient]);
+};
+
+// User Management hooks (for admin)
+export const useUsers = (params?: {
+  role?: string;
+  department?: string;
+  is_active?: boolean;
+  search?: string;
+}) => {
+  return useQuery({
+    queryKey: ['users', params],
+    queryFn: () => usersApi.getUsers(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useUser = (userId: number) => {
+  return useQuery({
+    queryKey: ['users', userId],
+    queryFn: () => usersApi.getUser(userId),
+    enabled: !!userId,
+  });
+};
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: usersApi.createUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success('User created successfully!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || 
+                          error?.response?.data?.email?.[0] ||
+                          'Failed to create user. Please try again.';
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ userId, userData }: { userId: number; userData: any }) => 
+      usersApi.updateUser(userId, userData),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['users', variables.userId] });
+      toast.success('User updated successfully!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || 
+                          'Failed to update user. Please try again.';
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: usersApi.deleteUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success('User deleted successfully!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || 
+                          'Failed to delete user. Please try again.';
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useUserStats = () => {
+  return useQuery({
+    queryKey: ['userStats'],
+    queryFn: usersApi.getUserStats,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
 };

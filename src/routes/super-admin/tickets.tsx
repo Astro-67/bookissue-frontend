@@ -11,8 +11,13 @@ import {
 } from 'react-icons/ri'
 
 function SuperAdminTickets() {
-  const { data: tickets, isLoading } = useTickets()
+  const { data: ticketsResponse, isLoading } = useTickets()
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
+
+  // Handle different API response formats
+  const tickets = Array.isArray(ticketsResponse) 
+    ? ticketsResponse 
+    : ticketsResponse?.results || ticketsResponse?.data || []
 
   const filteredTickets = tickets?.filter((ticket: Ticket) => {
     const statusMatch = selectedStatus === 'all' || ticket.status.toLowerCase() === selectedStatus
@@ -137,7 +142,7 @@ function SuperAdminTickets() {
                         {ticket.title}
                       </div>
                       <div className="text-sm text-gray-500">
-                        by {ticket.created_by?.first_name} {ticket.created_by?.last_name}
+                        by {ticket.created_by?.first_name || ''} {ticket.created_by?.last_name || ''}
                       </div>
                     </div>
                   </td>
@@ -148,12 +153,12 @@ function SuperAdminTickets() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {ticket.assigned_to 
-                      ? `${ticket.assigned_to.first_name} ${ticket.assigned_to.last_name}`
+                      ? `${ticket.assigned_to.first_name || ''} ${ticket.assigned_to.last_name || ''}`
                       : 'Unassigned'
                     }
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(ticket.created_at).toLocaleDateString()}
+                    {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                     <button className="text-blue-600 hover:text-blue-900">
