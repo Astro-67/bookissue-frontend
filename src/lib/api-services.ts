@@ -33,6 +33,16 @@ export const authApi = {
     return response.data;
   },
 
+  updateProfile: async (profileData: {
+    first_name?: string;
+    last_name?: string;
+    phone_number?: string;
+    email?: string;
+  }) => {
+    const response = await api.patch('/users/profile/', profileData);
+    return response.data;
+  },
+
   changePassword: async (passwordData: {
     old_password: string;
     new_password: string;

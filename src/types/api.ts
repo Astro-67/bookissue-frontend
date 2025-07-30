@@ -33,6 +33,19 @@ export interface RegisterData {
   department?: string;
 }
 
+export interface UpdateProfileData {
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  email?: string;
+}
+
+export interface ChangePasswordData {
+  old_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
 export interface AuthResponse {
   user: User;
   tokens: {

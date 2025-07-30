@@ -77,6 +77,23 @@ export const useCurrentUser = () => {
   });
 };
 
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: authApi.updateProfile,
+    onSuccess: (updatedUser) => {
+      // Update both profile and currentUser caches
+      queryClient.setQueryData(['profile'], updatedUser);
+      queryClient.setQueryData(['currentUser'], updatedUser);
+      toast.success('Profile updated successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Failed to update profile.');
+    },
+  });
+};
+
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: authApi.changePassword,
