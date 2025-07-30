@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri'
 import { Logo } from '../../../ui/Logo'
 import { useLogin } from '../../../hooks/api'
 import type { LoginCredentials } from '../../../types/api'
@@ -10,6 +11,7 @@ export const LoginForm: React.FC = () => {
     email: '',
     password: ''
   })
+  const [showPassword, setShowPassword] = useState(false)
 
   const loginMutation = useLogin()
 
@@ -33,6 +35,10 @@ export const LoginForm: React.FC = () => {
       ...prev,
       [e.target.name]: e.target.value
     }))
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(prev => !prev)
   }
 
   return (
@@ -67,21 +73,32 @@ export const LoginForm: React.FC = () => {
                 onChange={handleChange}
               />
             </div>
-            <div>
+            <div className="relative">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
               />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none"
+              >
+                {showPassword ? (
+                  <RiEyeOffLine className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                ) : (
+                  <RiEyeLine className="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                )}
+              </button>
             </div>
           </div>
 
