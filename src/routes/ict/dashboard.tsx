@@ -1,36 +1,44 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useAuth } from '../../contexts/AuthContext'
+import { useTickets, useUsers } from '../../hooks/api'
+import type { Ticket, User } from '../../types/api'
 
 export const Route = createFileRoute('/ict/dashboard')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { user } = useAuth()
+  const { data: ticketsResponse } = useTickets({})
+  const { data: usersResponse } = useUsers({})
+
+  // Extract arrays from API responses (handle pagination structure)
+  const tickets = Array.isArray(ticketsResponse) 
+    ? ticketsResponse 
+    : ticketsResponse?.results || ticketsResponse?.data || []
+    
+  const users = Array.isArray(usersResponse) 
+    ? usersResponse 
+    : usersResponse?.results || usersResponse?.data || []
+
+  // Calculate statistics
+  const activeUsers = users?.filter((u: User) => u.is_active).length || 0
+  
+  const myAssignedTickets = tickets?.filter((t: Ticket) => 
+    t.assigned_to?.id === user?.id
+  ).length || 0
+
+  const totalTickets = tickets?.length || 0
   return (
     <div className="space-y-6">
       {/* Welcome Card */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-6 text-white">
         <h2 className="text-2xl font-bold mb-2">ICT Admin Dashboard</h2>
-        <p className="text-purple-100">Monitor system health, manage users, and oversee critical infrastructure.</p>
+        <p className="text-blue-100">Monitor system health, manage users, and oversee critical infrastructure.</p>
       </div>
 
       {/* System Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Critical Issues</p>
-              <p className="text-2xl font-semibold text-gray-900">5</p>
-            </div>
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -42,7 +50,7 @@ function RouteComponent() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Active Users</p>
-              <p className="text-2xl font-semibold text-gray-900">156</p>
+              <p className="text-2xl font-semibold text-gray-900">{activeUsers}</p>
             </div>
           </div>
         </div>
@@ -57,8 +65,8 @@ function RouteComponent() {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">System Uptime</p>
-              <p className="text-2xl font-semibold text-gray-900">99.9%</p>
+              <p className="text-sm font-medium text-gray-500">My Assigned</p>
+              <p className="text-2xl font-semibold text-gray-900">{myAssignedTickets}</p>
             </div>
           </div>
         </div>
@@ -73,106 +81,8 @@ function RouteComponent() {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Server Load</p>
-              <p className="text-2xl font-semibold text-gray-900">23%</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* System Status & Recent Activities */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* System Status */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">System Status</h3>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
-                  <span className="text-sm font-medium text-gray-900">Database Server</span>
-                </div>
-                <span className="text-sm text-green-600">Operational</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
-                  <span className="text-sm font-medium text-gray-900">Web Application</span>
-                </div>
-                <span className="text-sm text-green-600">Operational</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full mr-3"></div>
-                  <span className="text-sm font-medium text-gray-900">File Storage</span>
-                </div>
-                <span className="text-sm text-yellow-600">Degraded</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-red-400 rounded-full mr-3 animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-900">Email Service</span>
-                </div>
-                <span className="text-sm text-red-600">Down</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Admin Activities */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Recent Activities</h3>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-gray-900">
-                    New user account created for <span className="font-medium">Sarah Wilson</span>
-                  </p>
-                  <p className="text-xs text-gray-500">2 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-gray-900">
-                    <span className="font-medium">Critical alert:</span> Email service disruption detected
-                  </p>
-                  <p className="text-xs text-gray-500">15 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-gray-900">
-                    Database backup completed successfully
-                  </p>
-                  <p className="text-xs text-gray-500">1 hour ago</p>
-                </div>
-              </div>
+              <p className="text-sm font-medium text-gray-500">Total Tickets</p>
+              <p className="text-2xl font-semibold text-gray-900">{totalTickets}</p>
             </div>
           </div>
         </div>

@@ -1,10 +1,37 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useAuth } from '../../contexts/AuthContext'
+import { useTickets } from '../../hooks/api'
+import type { Ticket } from '../../types/api'
 
 export const Route = createFileRoute('/staff/dashboard')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { user } = useAuth()
+  const { data: ticketsResponse } = useTickets({})
+
+  // Extract arrays from API responses (handle pagination structure)
+  const tickets = Array.isArray(ticketsResponse) 
+    ? ticketsResponse 
+    : ticketsResponse?.results || ticketsResponse?.data || []
+
+  // Calculate statistics for staff
+  const myTickets = tickets?.filter((t: Ticket) => 
+    t.created_by?.id === user?.id
+  ).length || 0
+
+  const openTickets = tickets?.filter((t: Ticket) => 
+    t.status === 'OPEN' && t.created_by?.id === user?.id
+  ).length || 0
+
+  const inProgressTickets = tickets?.filter((t: Ticket) => 
+    t.status === 'IN_PROGRESS' && t.created_by?.id === user?.id
+  ).length || 0
+
+  const resolvedTickets = tickets?.filter((t: Ticket) => 
+    t.status === 'RESOLVED' && t.created_by?.id === user?.id
+  ).length || 0
   return (
     <div className="space-y-6">
       {/* Welcome Card */}
@@ -26,7 +53,7 @@ function RouteComponent() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Open Issues</p>
-              <p className="text-2xl font-semibold text-gray-900">12</p>
+              <p className="text-2xl font-semibold text-gray-900">{openTickets}</p>
             </div>
           </div>
         </div>
@@ -41,8 +68,8 @@ function RouteComponent() {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Urgent Issues</p>
-              <p className="text-2xl font-semibold text-gray-900">3</p>
+              <p className="text-sm font-medium text-gray-500">In Progress</p>
+              <p className="text-2xl font-semibold text-gray-900">{inProgressTickets}</p>
             </div>
           </div>
         </div>
@@ -57,8 +84,8 @@ function RouteComponent() {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Resolved Today</p>
-              <p className="text-2xl font-semibold text-gray-900">8</p>
+              <p className="text-sm font-medium text-gray-500">Resolved</p>
+              <p className="text-2xl font-semibold text-gray-900">{resolvedTickets}</p>
             </div>
           </div>
         </div>
@@ -73,8 +100,8 @@ function RouteComponent() {
               </div>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Books Processed</p>
-              <p className="text-2xl font-semibold text-gray-900">45</p>
+              <p className="text-sm font-medium text-gray-500">My Total Tickets</p>
+              <p className="text-2xl font-semibold text-gray-900">{myTickets}</p>
             </div>
           </div>
         </div>

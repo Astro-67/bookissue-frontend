@@ -55,7 +55,6 @@ const roleConfig = {
       { name: 'Dashboard', href: '/ict/dashboard', icon: RiDashboardLine },
       { name: 'All Issues', href: '/ict/tickets', icon: RiTicketLine },
       { name: 'My Assigned', href: '/ict/assigned-tickets', icon: RiTeamLine },
-      { name: 'User Management', href: '/ict/users', icon: RiGroupLine },
     ],
     user: {
       name: 'Mike Taylor',

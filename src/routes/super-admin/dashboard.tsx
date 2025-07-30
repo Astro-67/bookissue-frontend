@@ -24,14 +24,6 @@ function SuperAdminDashboard() {
     ? usersResponse 
     : usersResponse?.results || usersResponse?.data || []
 
-  console.log('🔍 Dashboard Debug:')
-  console.log('  Tickets Response:', ticketsResponse)
-  console.log('  Users Response:', usersResponse)
-  console.log('  Extracted Tickets:', tickets)
-  console.log('  Extracted Users:', users)
-  console.log('  Tickets Length:', tickets?.length)
-  console.log('  Users Length:', users?.length)
-
   const stats = [
     {
       name: 'Total Tickets',
