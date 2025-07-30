@@ -121,7 +121,7 @@ export const useTickets = (params?: {
   return useQuery({
     queryKey: ['tickets', params],
     queryFn: () => ticketsApi.getTickets(params),
-    enabled: !!params, // Only run query when params are provided
+    enabled: true, // Always enable the query - params are optional
     staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes (formerly cacheTime)
     refetchOnWindowFocus: true, // Refetch when user comes back to the tab

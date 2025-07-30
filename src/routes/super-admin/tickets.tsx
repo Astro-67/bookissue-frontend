@@ -5,13 +5,12 @@ import type { Ticket } from '../../types/api'
 import { 
   RiEyeLine,
   RiDeleteBinLine,
-  RiEditLine,
   RiFilterLine,
   RiDownloadLine
 } from 'react-icons/ri'
 
 function SuperAdminTickets() {
-  const { data: ticketsResponse, isLoading } = useTickets()
+  const { data: ticketsResponse, isLoading } = useTickets({})
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
 
   // Handle different API response formats
@@ -161,13 +160,10 @@ function SuperAdminTickets() {
                     {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900">
+                    <button className="text-blue-600 hover:text-blue-900" title="View Ticket">
                       <RiEyeLine className="h-4 w-4" />
                     </button>
-                    <button className="text-green-600 hover:text-green-900">
-                      <RiEditLine className="h-4 w-4" />
-                    </button>
-                    <button className="text-red-600 hover:text-red-900">
+                    <button className="text-red-600 hover:text-red-900" title="Delete Ticket">
                       <RiDeleteBinLine className="h-4 w-4" />
                     </button>
                   </td>
@@ -185,35 +181,6 @@ function SuperAdminTickets() {
             </p>
           </div>
         )}
-      </div>
-
-      {/* Stats Summary */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Ticket Statistics</h3>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{tickets?.length || 0}</div>
-            <div className="text-sm text-gray-500">Total</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600">
-              {tickets?.filter((t: Ticket) => t.status === 'OPEN').length || 0}
-            </div>
-            <div className="text-sm text-gray-500">Open</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600">
-              {tickets?.filter((t: Ticket) => t.status === 'IN_PROGRESS').length || 0}
-            </div>
-            <div className="text-sm text-gray-500">In Progress</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {tickets?.filter((t: Ticket) => t.status === 'RESOLVED').length || 0}
-            </div>
-            <div className="text-sm text-gray-500">Resolved</div>
-          </div>
-        </div>
       </div>
     </div>
   )

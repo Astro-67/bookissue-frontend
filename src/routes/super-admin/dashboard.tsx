@@ -12,8 +12,25 @@ import {
 
 function SuperAdminDashboard() {
   const { user } = useAuth()
-  const { data: tickets } = useTickets()
-  const { data: users } = useUsers()
+  const { data: ticketsResponse } = useTickets({})
+  const { data: usersResponse } = useUsers({})
+
+  // Extract arrays from API responses (handle pagination structure)
+  const tickets = Array.isArray(ticketsResponse) 
+    ? ticketsResponse 
+    : ticketsResponse?.results || ticketsResponse?.data || []
+    
+  const users = Array.isArray(usersResponse) 
+    ? usersResponse 
+    : usersResponse?.results || usersResponse?.data || []
+
+  console.log('🔍 Dashboard Debug:')
+  console.log('  Tickets Response:', ticketsResponse)
+  console.log('  Users Response:', usersResponse)
+  console.log('  Extracted Tickets:', tickets)
+  console.log('  Extracted Users:', users)
+  console.log('  Tickets Length:', tickets?.length)
+  console.log('  Users Length:', users?.length)
 
   const stats = [
     {
