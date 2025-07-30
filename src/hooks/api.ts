@@ -101,7 +101,12 @@ export const useChangePassword = () => {
       toast.success('Password changed successfully!');
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to change password.');
+      // Handle specific validation errors from the enhanced API service
+      if (error.message) {
+        toast.error(error.message);
+      } else {
+        toast.error(error?.response?.data?.message || 'Failed to change password.');
+      }
     },
   });
 };

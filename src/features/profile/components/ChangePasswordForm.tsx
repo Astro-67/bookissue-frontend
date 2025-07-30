@@ -11,12 +11,10 @@ import {
 import { useChangePassword } from '../../../hooks/api';
 import type { ChangePasswordData } from '../../../types/api';
 
-// Validation schema
+// Simple validation schema
 const passwordSchema = z.object({
   old_password: z.string().min(1, 'Current password is required'),
-  new_password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain uppercase, lowercase, and number'),
+  new_password: z.string().min(8, 'Password must be at least 8 characters'),
   confirm_password: z.string().min(1, 'Please confirm your password'),
 }).refine((data) => data.new_password === data.confirm_password, {
   message: "Passwords don't match",
@@ -69,7 +67,7 @@ const ChangePasswordForm: React.FC = () => {
     }
   };
 
-  // Password strength indicator
+  // Simple password strength indicator
   const getPasswordStrength = (password: string) => {
     if (!password) return { score: 0, label: '', color: '' };
     
@@ -82,11 +80,11 @@ const ChangePasswordForm: React.FC = () => {
 
     const strengths = [
       { score: 0, label: '', color: '' },
-      { score: 1, label: 'Very Weak', color: 'bg-red-500' },
-      { score: 2, label: 'Weak', color: 'bg-orange-500' },
-      { score: 3, label: 'Fair', color: 'bg-yellow-500' },
-      { score: 4, label: 'Good', color: 'bg-blue-500' },
-      { score: 5, label: 'Strong', color: 'bg-green-500' },
+      { score: 1, label: 'Weak', color: 'bg-red-500' },
+      { score: 2, label: 'Fair', color: 'bg-yellow-500' },
+      { score: 3, label: 'Good', color: 'bg-blue-500' },
+      { score: 4, label: 'Strong', color: 'bg-green-500' },
+      { score: 5, label: 'Very Strong', color: 'bg-green-600' },
     ];
 
     return strengths[score];
@@ -173,7 +171,7 @@ const ChangePasswordForm: React.FC = () => {
             </button>
           </div>
           
-          {/* Password strength indicator */}
+          {/* Simple password strength indicator */}
           {newPassword && (
             <div className="mt-2">
               <div className="flex items-center space-x-2">
@@ -184,7 +182,10 @@ const ChangePasswordForm: React.FC = () => {
                   />
                 </div>
                 {passwordStrength.label && (
-                  <span className="text-xs font-medium text-gray-600">
+                  <span className={`text-xs font-medium ${
+                    passwordStrength.score >= 4 ? 'text-green-600' : 
+                    passwordStrength.score >= 3 ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
                     {passwordStrength.label}
                   </span>
                 )}
@@ -196,23 +197,9 @@ const ChangePasswordForm: React.FC = () => {
             <p className="mt-1 text-sm text-red-600">{errors.new_password.message}</p>
           )}
           
-          {/* Password requirements */}
+          {/* Simple password hint */}
           <div className="mt-2 text-xs text-gray-500">
-            <p>Password must contain:</p>
-            <ul className="list-disc list-inside mt-1 space-y-1">
-              <li className={newPassword?.length >= 8 ? 'text-green-600' : 'text-gray-500'}>
-                At least 8 characters
-              </li>
-              <li className={/[a-z]/.test(newPassword || '') ? 'text-green-600' : 'text-gray-500'}>
-                One lowercase letter
-              </li>
-              <li className={/[A-Z]/.test(newPassword || '') ? 'text-green-600' : 'text-gray-500'}>
-                One uppercase letter
-              </li>
-              <li className={/\d/.test(newPassword || '') ? 'text-green-600' : 'text-gray-500'}>
-                One number
-              </li>
-            </ul>
+            Choose a strong, unique password that's not similar to your personal information.
           </div>
         </div>
 

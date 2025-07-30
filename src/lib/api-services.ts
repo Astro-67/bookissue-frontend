@@ -48,8 +48,85 @@ export const authApi = {
     new_password: string;
     confirm_password: string;
   }) => {
-    const response = await api.post('/users/profile/change-password/', passwordData);
-    return response.data;
+    // Map frontend field names to backend expected field names
+    const backendData = {
+      old_password: passwordData.old_password,
+      new_password: passwordData.new_password,
+      new_password_confirm: passwordData.confirm_password,
+    };
+    
+    try {
+      const response = await api.post('/users/profile/change-password/', backendData, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      return response.data;
+    } catch (error: any) {
+      
+      // Extract and throw clear, user-friendly validation errors
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        
+        // Handle password validation errors with user-friendly messages
+        if (errorData.new_password && Array.isArray(errorData.new_password)) {
+          const passwordErrors = errorData.new_password.map((err: string) => {
+            // Convert Django error messages to user-friendly ones
+            if (err.includes('too common')) {
+              return 'This password is too common. Please choose a more unique password.';
+            }
+            if (err.includes('too similar')) {
+              return 'Password is too similar to your personal information. Please choose a different password.';
+            }
+            if (err.includes('too short')) {
+              return 'Password must be at least 8 characters long.';
+            }
+            if (err.includes('entirely numeric')) {
+              return 'Password cannot be entirely numeric. Please include letters or symbols.';
+            }
+            if (err.includes('password_too_common')) {
+              return 'This password is too common. Please choose a more unique password.';
+            }
+            if (err.includes('password_too_similar')) {
+              return 'Password is too similar to your personal information.';
+            }
+            if (err.includes('password_too_short')) {
+              return 'Password must be at least 8 characters long.';
+            }
+            if (err.includes('password_entirely_numeric')) {
+              return 'Password cannot be entirely numeric.';
+            }
+            // Return original message if no specific match
+            return err;
+          });
+          
+          throw new Error(passwordErrors.join(' '));
+        }
+        
+        // Handle old password errors
+        if (errorData.old_password && Array.isArray(errorData.old_password)) {
+          throw new Error('Current password is incorrect.');
+        }
+        
+        // Handle password confirmation errors
+        if (errorData.new_password_confirm && Array.isArray(errorData.new_password_confirm)) {
+          throw new Error("Password confirmation doesn't match.");
+        }
+        
+        // Handle non-field errors (like password mismatch)
+        if (errorData.non_field_errors && Array.isArray(errorData.non_field_errors)) {
+          const nonFieldErrors = errorData.non_field_errors.map((err: string) => {
+            if (err.includes("don't match")) {
+              return "New passwords don't match.";
+            }
+            return err;
+          });
+          throw new Error(nonFieldErrors.join(' '));
+        }
+      }
+      
+      throw error;
+    }
   },
 };
 
