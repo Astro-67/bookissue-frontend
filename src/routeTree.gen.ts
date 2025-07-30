@@ -14,6 +14,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SuperAdminUsersRouteImport } from './routes/super-admin/users'
+import { Route as SuperAdminTicketsRouteImport } from './routes/super-admin/tickets'
+import { Route as SuperAdminStaffRouteImport } from './routes/super-admin/staff'
+import { Route as SuperAdminSettingsRouteImport } from './routes/super-admin/settings'
+import { Route as SuperAdminDashboardRouteImport } from './routes/super-admin/dashboard'
+import { Route as SuperAdminLayoutRouteImport } from './routes/super-admin/_layout'
 import { Route as StudentTicketsRouteImport } from './routes/student/tickets'
 import { Route as StudentProfileRouteImport } from './routes/student/profile'
 import { Route as StudentDashboardRouteImport } from './routes/student/dashboard'
@@ -34,10 +40,16 @@ import { Route as StaffTicketTicketIdRouteImport } from './routes/staff/ticket/$
 import { Route as IctTicketsAssignedRouteImport } from './routes/ict/tickets/assigned'
 import { Route as IctTicketTicketIdRouteImport } from './routes/ict/ticket/$ticketId'
 
+const SuperAdminRouteImport = createFileRoute('/super-admin')()
 const StudentRouteImport = createFileRoute('/student')()
 const StaffRouteImport = createFileRoute('/staff')()
 const IctRouteImport = createFileRoute('/ict')()
 
+const SuperAdminRoute = SuperAdminRouteImport.update({
+  id: '/super-admin',
+  path: '/super-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
   path: '/student',
@@ -67,6 +79,35 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SuperAdminUsersRoute = SuperAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => SuperAdminRoute,
+} as any)
+const SuperAdminTicketsRoute = SuperAdminTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => SuperAdminRoute,
+} as any)
+const SuperAdminStaffRoute = SuperAdminStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => SuperAdminRoute,
+} as any)
+const SuperAdminSettingsRoute = SuperAdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => SuperAdminRoute,
+} as any)
+const SuperAdminDashboardRoute = SuperAdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => SuperAdminRoute,
+} as any)
+const SuperAdminLayoutRoute = SuperAdminLayoutRouteImport.update({
+  id: '/_layout',
+  getParentRoute: () => SuperAdminRoute,
 } as any)
 const StudentTicketsRoute = StudentTicketsRouteImport.update({
   id: '/tickets',
@@ -178,6 +219,12 @@ export interface FileRoutesByFullPath {
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/profile': typeof StudentProfileRoute
   '/student/tickets': typeof StudentTicketsRouteWithChildren
+  '/super-admin': typeof SuperAdminLayoutRoute
+  '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/settings': typeof SuperAdminSettingsRoute
+  '/super-admin/staff': typeof SuperAdminStaffRoute
+  '/super-admin/tickets': typeof SuperAdminTicketsRoute
+  '/super-admin/users': typeof SuperAdminUsersRoute
   '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
   '/ict/tickets/assigned': typeof IctTicketsAssignedRoute
   '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
@@ -201,6 +248,12 @@ export interface FileRoutesByTo {
   '/student': typeof StudentLayoutRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/profile': typeof StudentProfileRoute
+  '/super-admin': typeof SuperAdminLayoutRoute
+  '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/settings': typeof SuperAdminSettingsRoute
+  '/super-admin/staff': typeof SuperAdminStaffRoute
+  '/super-admin/tickets': typeof SuperAdminTicketsRoute
+  '/super-admin/users': typeof SuperAdminUsersRoute
   '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
   '/ict/tickets/assigned': typeof IctTicketsAssignedRoute
   '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
@@ -229,6 +282,13 @@ export interface FileRoutesById {
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/profile': typeof StudentProfileRoute
   '/student/tickets': typeof StudentTicketsRouteWithChildren
+  '/super-admin': typeof SuperAdminRouteWithChildren
+  '/super-admin/_layout': typeof SuperAdminLayoutRoute
+  '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/settings': typeof SuperAdminSettingsRoute
+  '/super-admin/staff': typeof SuperAdminStaffRoute
+  '/super-admin/tickets': typeof SuperAdminTicketsRoute
+  '/super-admin/users': typeof SuperAdminUsersRoute
   '/ict/ticket/$ticketId': typeof IctTicketTicketIdRoute
   '/ict/tickets/assigned': typeof IctTicketsAssignedRoute
   '/staff/ticket/$ticketId': typeof StaffTicketTicketIdRoute
@@ -255,6 +315,12 @@ export interface FileRouteTypes {
     | '/student/dashboard'
     | '/student/profile'
     | '/student/tickets'
+    | '/super-admin'
+    | '/super-admin/dashboard'
+    | '/super-admin/settings'
+    | '/super-admin/staff'
+    | '/super-admin/tickets'
+    | '/super-admin/users'
     | '/ict/ticket/$ticketId'
     | '/ict/tickets/assigned'
     | '/staff/ticket/$ticketId'
@@ -278,6 +344,12 @@ export interface FileRouteTypes {
     | '/student'
     | '/student/dashboard'
     | '/student/profile'
+    | '/super-admin'
+    | '/super-admin/dashboard'
+    | '/super-admin/settings'
+    | '/super-admin/staff'
+    | '/super-admin/tickets'
+    | '/super-admin/users'
     | '/ict/ticket/$ticketId'
     | '/ict/tickets/assigned'
     | '/staff/ticket/$ticketId'
@@ -305,6 +377,13 @@ export interface FileRouteTypes {
     | '/student/dashboard'
     | '/student/profile'
     | '/student/tickets'
+    | '/super-admin'
+    | '/super-admin/_layout'
+    | '/super-admin/dashboard'
+    | '/super-admin/settings'
+    | '/super-admin/staff'
+    | '/super-admin/tickets'
+    | '/super-admin/users'
     | '/ict/ticket/$ticketId'
     | '/ict/tickets/assigned'
     | '/staff/ticket/$ticketId'
@@ -320,10 +399,18 @@ export interface RootRouteChildren {
   IctRoute: typeof IctRouteWithChildren
   StaffRoute: typeof StaffRouteWithChildren
   StudentRoute: typeof StudentRouteWithChildren
+  SuperAdminRoute: typeof SuperAdminRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/super-admin': {
+      id: '/super-admin'
+      path: '/super-admin'
+      fullPath: '/super-admin'
+      preLoaderRoute: typeof SuperAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/student': {
       id: '/student'
       path: '/student'
@@ -365,6 +452,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/super-admin/users': {
+      id: '/super-admin/users'
+      path: '/users'
+      fullPath: '/super-admin/users'
+      preLoaderRoute: typeof SuperAdminUsersRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
+    '/super-admin/tickets': {
+      id: '/super-admin/tickets'
+      path: '/tickets'
+      fullPath: '/super-admin/tickets'
+      preLoaderRoute: typeof SuperAdminTicketsRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
+    '/super-admin/staff': {
+      id: '/super-admin/staff'
+      path: '/staff'
+      fullPath: '/super-admin/staff'
+      preLoaderRoute: typeof SuperAdminStaffRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
+    '/super-admin/settings': {
+      id: '/super-admin/settings'
+      path: '/settings'
+      fullPath: '/super-admin/settings'
+      preLoaderRoute: typeof SuperAdminSettingsRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
+    '/super-admin/dashboard': {
+      id: '/super-admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/super-admin/dashboard'
+      preLoaderRoute: typeof SuperAdminDashboardRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
+    '/super-admin/_layout': {
+      id: '/super-admin/_layout'
+      path: '/super-admin'
+      fullPath: '/super-admin'
+      preLoaderRoute: typeof SuperAdminLayoutRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/student/tickets': {
       id: '/student/tickets'
@@ -585,6 +714,28 @@ const StudentRouteChildren: StudentRouteChildren = {
 const StudentRouteWithChildren =
   StudentRoute._addFileChildren(StudentRouteChildren)
 
+interface SuperAdminRouteChildren {
+  SuperAdminLayoutRoute: typeof SuperAdminLayoutRoute
+  SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
+  SuperAdminSettingsRoute: typeof SuperAdminSettingsRoute
+  SuperAdminStaffRoute: typeof SuperAdminStaffRoute
+  SuperAdminTicketsRoute: typeof SuperAdminTicketsRoute
+  SuperAdminUsersRoute: typeof SuperAdminUsersRoute
+}
+
+const SuperAdminRouteChildren: SuperAdminRouteChildren = {
+  SuperAdminLayoutRoute: SuperAdminLayoutRoute,
+  SuperAdminDashboardRoute: SuperAdminDashboardRoute,
+  SuperAdminSettingsRoute: SuperAdminSettingsRoute,
+  SuperAdminStaffRoute: SuperAdminStaffRoute,
+  SuperAdminTicketsRoute: SuperAdminTicketsRoute,
+  SuperAdminUsersRoute: SuperAdminUsersRoute,
+}
+
+const SuperAdminRouteWithChildren = SuperAdminRoute._addFileChildren(
+  SuperAdminRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
@@ -592,6 +743,7 @@ const rootRouteChildren: RootRouteChildren = {
   IctRoute: IctRouteWithChildren,
   StaffRoute: StaffRouteWithChildren,
   StudentRoute: StudentRouteWithChildren,
+  SuperAdminRoute: SuperAdminRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

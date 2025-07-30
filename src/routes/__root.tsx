@@ -33,13 +33,15 @@ function AuthenticatedApp() {
   }
   
   // Determine the role based on the current path or user role
-  let role: 'student' | 'staff' | 'ict' = user?.role || 'student'
+  let role: 'student' | 'staff' | 'ict' | 'super_admin' = user?.role || 'student'
   if (pathname.startsWith('/staff')) {
     role = 'staff'
   } else if (pathname.startsWith('/ict')) {
     role = 'ict'
   } else if (pathname.startsWith('/student')) {
     role = 'student'
+  } else if (pathname.startsWith('/super-admin')) {
+    role = 'super_admin'
   }
 
   return (

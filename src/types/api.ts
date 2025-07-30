@@ -6,7 +6,7 @@ export interface User {
   first_name: string;
   last_name: string;
   full_name: string;
-  role: 'student' | 'staff' | 'ict';
+  role: 'student' | 'staff' | 'ict' | 'super_admin';
   phone_number?: string;
   student_id?: string;
   department?: string;
@@ -27,7 +27,7 @@ export interface RegisterData {
   password_confirm: string;
   first_name: string;
   last_name: string;
-  role: 'student' | 'staff' | 'ict';
+  role: 'student' | 'staff' | 'ict' | 'super_admin';
   phone_number?: string;
   student_id?: string;
   department?: string;
