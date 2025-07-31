@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'react-hot-toast';
 import { 
   RiUser3Line, 
   RiMailLine, 
   RiPhoneLine, 
-  RiSaveLine,
-  RiCameraLine
+  RiSaveLine
 } from 'react-icons/ri';
-import { useCurrentUser, useUpdateProfile } from '../../../hooks/api';
+import { useCurrentUser, useUpdateProfileSilent, useUploadProfilePictureSilent, useDeleteProfilePictureSilent } from '../../../hooks/api';
 import { ProfilePictureUpload } from './ProfilePictureUpload';
 import type { UpdateProfileData } from '../../../types/api';
 
@@ -17,7 +17,6 @@ import type { UpdateProfileData } from '../../../types/api';
 const profileSchema = z.object({
   first_name: z.string().min(1, 'First name is required').max(50, 'First name too long'),
   last_name: z.string().min(1, 'Last name is required').max(50, 'Last name too long'),
-  email: z.string().email('Invalid email address'),
   phone_number: z.string().optional().or(z.literal('')),
 });
 
@@ -25,8 +24,12 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 const ProfileForm: React.FC = () => {
   const { data: user, isLoading } = useCurrentUser();
-  const updateProfile = useUpdateProfile();
+  const updateProfile = useUpdateProfileSilent();
+  const uploadProfilePicture = useUploadProfilePictureSilent();
+  const deleteProfilePicture = useDeleteProfilePictureSilent();
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedProfilePicture, setSelectedProfilePicture] = useState<File | null>(null);
+  const [shouldDeleteProfilePicture, setShouldDeleteProfilePicture] = useState(false);
 
   const {
     register,
@@ -38,7 +41,6 @@ const ProfileForm: React.FC = () => {
     defaultValues: user ? {
       first_name: user.first_name || '',
       last_name: user.last_name || '',
-      email: user.email || '',
       phone_number: user.phone_number || '',
     } : {},
   });
@@ -49,7 +51,6 @@ const ProfileForm: React.FC = () => {
       reset({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
-        email: user.email || '',
         phone_number: user.phone_number || '',
       });
     }
@@ -57,23 +58,43 @@ const ProfileForm: React.FC = () => {
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
+      // Update profile data
       const updateData: UpdateProfileData = {
         first_name: data.first_name,
         last_name: data.last_name,
-        email: data.email,
         phone_number: data.phone_number || undefined,
       };
 
       await updateProfile.mutateAsync(updateData);
+
+      // Delete profile picture if requested
+      if (shouldDeleteProfilePicture) {
+        await deleteProfilePicture.mutateAsync();
+        setShouldDeleteProfilePicture(false);
+      }
+
+      // Upload profile picture if selected
+      if (selectedProfilePicture) {
+        await uploadProfilePicture.mutateAsync(selectedProfilePicture);
+        setSelectedProfilePicture(null);
+      }
+
       setIsEditing(false);
+      toast.success('Profile updated successfully!');
     } catch (error) {
-      // Error is handled by the mutation hook
+      // Error is handled by the mutation hooks
     }
   };
 
   const handleCancel = () => {
     reset();
+    setSelectedProfilePicture(null);
+    setShouldDeleteProfilePicture(false);
     setIsEditing(false);
+  };
+
+  const handleDeleteProfilePicture = () => {
+    setShouldDeleteProfilePicture(true);
   };
 
   if (isLoading) {
@@ -115,28 +136,53 @@ const ProfileForm: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Profile Picture Upload - Only show when editing */}
-        {isEditing && (
-          <div className="space-y-4 pb-6 border-b border-gray-200">
-            <h3 className="text-sm font-medium text-gray-900 flex items-center">
-              <RiCameraLine className="w-4 h-4 mr-2" />
-              Update Profile Picture
-            </h3>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">
-                Upload a new profile picture. Recommended size: 200x200px. Max file size: 5MB.
-              </p>
-              <ProfilePictureUpload />
-            </div>
-          </div>
-        )}
-
         {/* Personal Information Fields */}
-        <div className={isEditing ? "space-y-6" : "space-y-6"}>
+        <div className="space-y-6">
           <h3 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
             <RiUser3Line className="w-4 h-4 mr-2" />
             Personal Details
           </h3>
+
+          {/* Profile Picture Field */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Profile Picture
+            </label>
+            {isEditing ? (
+              <div className="space-y-2">
+                <ProfilePictureUpload 
+                  onFileSelect={setSelectedProfilePicture}
+                  currentProfilePicture={user?.profile_picture_url || user?.profile_picture}
+                  onDelete={handleDeleteProfilePicture}
+                  isEditing={isEditing}
+                />
+                {selectedProfilePicture && (
+                  <p className="text-sm text-green-600">
+                    Selected: {selectedProfilePicture.name}
+                  </p>
+                )}
+                {shouldDeleteProfilePicture && (
+                  <p className="text-sm text-orange-600">
+                    Current profile picture will be removed when you save changes.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <input
+                  type="file"
+                  disabled
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-gray-50 file:text-gray-500 hover:file:bg-gray-50 border border-gray-200 bg-gray-50 rounded-md cursor-not-allowed"
+                />
+                <p className="text-xs text-gray-500">
+                  {user.profile_picture_url 
+                    ? 'Profile picture uploaded' 
+                    : 'No profile picture uploaded'
+                  }
+                </p>
+              </div>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* First Name */}
@@ -194,31 +240,24 @@ const ProfileForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Email */}
+        {/* Email - Always Read-only */}
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            Email Address
+            Email Address <span className="text-gray-400">(Read-only)</span>
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <RiMailLine className="w-5 h-5 text-gray-400" />
             </div>
             <input
-              {...register('email')}
               type="email"
               id="email"
-              disabled={!isEditing}
-              className={`block w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                isEditing 
-                  ? 'border-gray-300 bg-white' 
-                  : 'border-gray-200 bg-gray-50 text-gray-600'
-              } ${errors.email ? 'border-red-300 ring-red-500' : ''}`}
-              placeholder="Enter your email address"
+              value={user.email || ''}
+              readOnly
+              className="block w-full pl-10 pr-3 py-2 border border-gray-200 bg-gray-50 text-gray-600 rounded-lg cursor-not-allowed"
             />
           </div>
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-          )}
+          <p className="mt-1 text-xs text-gray-500">Email cannot be changed from this form</p>
         </div>
 
         {/* Phone Number */}
@@ -249,25 +288,30 @@ const ProfileForm: React.FC = () => {
         </div>
         </div>
 
-        {/* Read-only fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
-            <input
-              type="text"
-              value={user.student_id || 'Not assigned'}
-              readOnly
-              className="block w-full px-3 py-2 border border-gray-200 bg-gray-50 text-gray-600 rounded-lg"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-            <input
-              type="text"
-              value={user.role?.toUpperCase() || 'STUDENT'}
-              readOnly
-              className="block w-full px-3 py-2 border border-gray-200 bg-gray-50 text-gray-600 rounded-lg"
-            />
+        {/* Read-only System Information */}
+        <div className="pt-6 border-t border-gray-200">
+          <h3 className="text-sm font-medium text-gray-900 mb-4">
+            System Information
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Student ID</label>
+              <input
+                type="text"
+                value={user.student_id || 'Not assigned'}
+                readOnly
+                className="block w-full px-3 py-2 border border-gray-200 bg-gray-50 text-gray-600 rounded-lg cursor-not-allowed"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <input
+                type="text"
+                value={user.role?.toUpperCase() || 'STUDENT'}
+                readOnly
+                className="block w-full px-3 py-2 border border-gray-200 bg-gray-50 text-gray-600 rounded-lg cursor-not-allowed"
+              />
+            </div>
           </div>
         </div>
 
@@ -283,15 +327,15 @@ const ProfileForm: React.FC = () => {
             </button>
             <button
               type="submit"
-              disabled={!isDirty || updateProfile.isPending}
+              disabled={(!isDirty && !selectedProfilePicture && !shouldDeleteProfilePicture) || updateProfile.isPending || uploadProfilePicture.isPending || deleteProfilePicture.isPending}
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {updateProfile.isPending ? (
+              {updateProfile.isPending || uploadProfilePicture.isPending || deleteProfilePicture.isPending ? (
                 <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <RiSaveLine className="w-4 h-4 mr-2" />
               )}
-              {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+              {updateProfile.isPending || uploadProfilePicture.isPending || deleteProfilePicture.isPending ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         )}

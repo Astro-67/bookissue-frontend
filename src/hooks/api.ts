@@ -94,6 +94,20 @@ export const useUpdateProfile = () => {
   });
 };
 
+// Hook without toast for combined operations
+export const useUpdateProfileSilent = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: authApi.updateProfile,
+    onSuccess: (updatedUser) => {
+      // Update both profile and currentUser caches
+      queryClient.setQueryData(['profile'], updatedUser);
+      queryClient.setQueryData(['currentUser'], updatedUser);
+    },
+  });
+};
+
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: authApi.changePassword,
@@ -134,6 +148,23 @@ export const useUploadProfilePicture = () => {
   });
 };
 
+// Hook without toast for combined operations
+export const useUploadProfilePictureSilent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authApi.uploadProfilePicture,
+    onSuccess: () => {
+      // Invalidate and refetch both profile and currentUser queries
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      // Also force refetch to ensure immediate update
+      queryClient.refetchQueries({ queryKey: ['profile'] });
+      queryClient.refetchQueries({ queryKey: ['currentUser'] });
+    },
+  });
+};
+
 export const useDeleteProfilePicture = () => {
   const queryClient = useQueryClient();
   
@@ -150,6 +181,23 @@ export const useDeleteProfilePicture = () => {
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || 'Failed to delete profile picture.');
+    },
+  });
+};
+
+// Hook without toast for combined operations
+export const useDeleteProfilePictureSilent = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: authApi.deleteProfilePicture,
+    onSuccess: () => {
+      // Invalidate and refetch both profile and currentUser queries
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      // Also force refetch to ensure immediate update
+      queryClient.refetchQueries({ queryKey: ['profile'] });
+      queryClient.refetchQueries({ queryKey: ['currentUser'] });
     },
   });
 };
