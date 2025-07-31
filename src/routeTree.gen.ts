@@ -30,6 +30,7 @@ import { Route as StaffDashboardRouteImport } from './routes/staff/dashboard'
 import { Route as StaffAssignedTicketsRouteImport } from './routes/staff/assigned-tickets'
 import { Route as StaffLayoutRouteImport } from './routes/staff/_layout'
 import { Route as IctTicketsRouteImport } from './routes/ict/tickets'
+import { Route as IctProfileRouteImport } from './routes/ict/profile'
 import { Route as IctNotificationsRouteImport } from './routes/ict/notifications'
 import { Route as IctDashboardRouteImport } from './routes/ict/dashboard'
 import { Route as IctAssignedTicketsRouteImport } from './routes/ict/assigned-tickets'
@@ -160,6 +161,11 @@ const IctTicketsRoute = IctTicketsRouteImport.update({
   path: '/tickets',
   getParentRoute: () => IctRoute,
 } as any)
+const IctProfileRoute = IctProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => IctRoute,
+} as any)
 const IctNotificationsRoute = IctNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/ict/assigned-tickets': typeof IctAssignedTicketsRoute
   '/ict/dashboard': typeof IctDashboardRoute
   '/ict/notifications': typeof IctNotificationsRoute
+  '/ict/profile': typeof IctProfileRoute
   '/ict/tickets': typeof IctTicketsRouteWithChildren
   '/staff': typeof StaffLayoutRoute
   '/staff/assigned-tickets': typeof StaffAssignedTicketsRoute
@@ -262,6 +269,7 @@ export interface FileRoutesByTo {
   '/ict/assigned-tickets': typeof IctAssignedTicketsRoute
   '/ict/dashboard': typeof IctDashboardRoute
   '/ict/notifications': typeof IctNotificationsRoute
+  '/ict/profile': typeof IctProfileRoute
   '/ict/tickets': typeof IctTicketsRouteWithChildren
   '/staff': typeof StaffLayoutRoute
   '/staff/assigned-tickets': typeof StaffAssignedTicketsRoute
@@ -296,6 +304,7 @@ export interface FileRoutesById {
   '/ict/assigned-tickets': typeof IctAssignedTicketsRoute
   '/ict/dashboard': typeof IctDashboardRoute
   '/ict/notifications': typeof IctNotificationsRoute
+  '/ict/profile': typeof IctProfileRoute
   '/ict/tickets': typeof IctTicketsRouteWithChildren
   '/staff': typeof StaffRouteWithChildren
   '/staff/_layout': typeof StaffLayoutRoute
@@ -334,6 +343,7 @@ export interface FileRouteTypes {
     | '/ict/assigned-tickets'
     | '/ict/dashboard'
     | '/ict/notifications'
+    | '/ict/profile'
     | '/ict/tickets'
     | '/staff'
     | '/staff/assigned-tickets'
@@ -367,6 +377,7 @@ export interface FileRouteTypes {
     | '/ict/assigned-tickets'
     | '/ict/dashboard'
     | '/ict/notifications'
+    | '/ict/profile'
     | '/ict/tickets'
     | '/staff'
     | '/staff/assigned-tickets'
@@ -400,6 +411,7 @@ export interface FileRouteTypes {
     | '/ict/assigned-tickets'
     | '/ict/dashboard'
     | '/ict/notifications'
+    | '/ict/profile'
     | '/ict/tickets'
     | '/staff'
     | '/staff/_layout'
@@ -602,6 +614,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IctTicketsRouteImport
       parentRoute: typeof IctRoute
     }
+    '/ict/profile': {
+      id: '/ict/profile'
+      path: '/profile'
+      fullPath: '/ict/profile'
+      preLoaderRoute: typeof IctProfileRouteImport
+      parentRoute: typeof IctRoute
+    }
     '/ict/notifications': {
       id: '/ict/notifications'
       path: '/notifications'
@@ -706,6 +725,7 @@ interface IctRouteChildren {
   IctAssignedTicketsRoute: typeof IctAssignedTicketsRoute
   IctDashboardRoute: typeof IctDashboardRoute
   IctNotificationsRoute: typeof IctNotificationsRoute
+  IctProfileRoute: typeof IctProfileRoute
   IctTicketsRoute: typeof IctTicketsRouteWithChildren
   IctTicketTicketIdRoute: typeof IctTicketTicketIdRoute
 }
@@ -715,6 +735,7 @@ const IctRouteChildren: IctRouteChildren = {
   IctAssignedTicketsRoute: IctAssignedTicketsRoute,
   IctDashboardRoute: IctDashboardRoute,
   IctNotificationsRoute: IctNotificationsRoute,
+  IctProfileRoute: IctProfileRoute,
   IctTicketsRoute: IctTicketsRouteWithChildren,
   IctTicketTicketIdRoute: IctTicketTicketIdRoute,
 }
