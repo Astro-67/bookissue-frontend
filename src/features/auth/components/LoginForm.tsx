@@ -22,7 +22,9 @@ export const LoginForm: React.FC = () => {
       onSuccess: (data) => {
         // Navigate to appropriate dashboard based on user role
         const role = data.user.role
-        router.navigate({ to: `/${role}/dashboard` })
+        // Convert super_admin to super-admin for routing
+        const routeRole = role === 'super_admin' ? 'super-admin' : role
+        router.navigate({ to: `/${routeRole}/dashboard` })
       },
       onError: () => {
         // Error is already handled by the mutation state

@@ -28,7 +28,9 @@ function AuthenticatedApp() {
 
   // If user is authenticated and has user data but on auth page, redirect to dashboard
   if (isAuthenticated && user && (pathname === '/login' || pathname === '/')) {
-    window.location.href = `/${user.role}/dashboard`
+    // Convert super_admin to super-admin for routing
+    const routeRole = user.role === 'super_admin' ? 'super-admin' : user.role
+    window.location.href = `/${routeRole}/dashboard`
     return <LoadingSpinner />
   }
   

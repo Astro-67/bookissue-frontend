@@ -87,7 +87,9 @@ export const SharedLayout: React.FC<SharedLayoutProps> = ({ role, children }) =>
   useEffect(() => {
     if (user && user.role !== role) {
       // If user role doesn't match the route, redirect to correct dashboard
-      window.location.href = `/${user.role}/dashboard`;
+      // Convert super_admin to super-admin for routing
+      const routeRole = user.role === 'super_admin' ? 'super-admin' : user.role
+      window.location.href = `/${routeRole}/dashboard`;
     }
   }, [user, role]);
 
