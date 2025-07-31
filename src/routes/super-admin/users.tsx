@@ -253,57 +253,38 @@ function SuperAdminUsers() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 relative">
-                          {(() => {
-                            const profileUrl = user.profile_picture_url || user.profile_picture;
-                            const mediaUrl = getMediaUrl(profileUrl);
-                            
-                            // Debug logging
-                            console.log('User:', user.email, {
-                              profile_picture_url: user.profile_picture_url,
-                              profile_picture: user.profile_picture,
-                              profileUrl,
-                              mediaUrl
-                            });
-                            
-                            if (mediaUrl) {
-                              return (
-                                <>
-                                  <img
-                                    className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
-                                    src={mediaUrl}
-                                    alt={`${user.first_name || ''} ${user.last_name || ''}`}
-                                    onLoad={() => console.log('✅ Image loaded:', mediaUrl)}
-                                    onError={(e) => {
-                                      console.log('❌ Image failed to load:', mediaUrl);
-                                      // Hide the broken image and show fallback
-                                      const target = e.target as HTMLImageElement;
-                                      target.style.display = 'none';
-                                      const fallback = target.nextElementSibling as HTMLElement;
-                                      if (fallback) {
-                                        fallback.style.display = 'flex';
-                                      }
-                                    }}
-                                  />
-                                  <div 
-                                    className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center absolute top-0 left-0"
-                                    style={{ display: 'none' }}
-                                  >
-                                    <span className="text-sm font-medium text-gray-700">
-                                      {(user.first_name?.[0] || '').toUpperCase()}{(user.last_name?.[0] || '').toUpperCase()}
-                                    </span>
-                                  </div>
-                                </>
-                              );
-                            } else {
-                              return (
-                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                  <span className="text-sm font-medium text-gray-700">
-                                    {(user.first_name?.[0] || '').toUpperCase()}{(user.last_name?.[0] || '').toUpperCase()}
-                                  </span>
-                                </div>
-                              );
-                            }
-                          })()}
+                          {getMediaUrl(user.profile_picture_url || user.profile_picture) ? (
+                            <>
+                              <img
+                                className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                                src={getMediaUrl(user.profile_picture_url || user.profile_picture)!}
+                                alt={`${user.first_name || ''} ${user.last_name || ''}`}
+                                onError={(e) => {
+                                  // Hide the broken image and show fallback
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const fallback = target.nextElementSibling as HTMLElement;
+                                  if (fallback) {
+                                    fallback.style.display = 'flex';
+                                  }
+                                }}
+                              />
+                              <div 
+                                className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center absolute top-0 left-0"
+                                style={{ display: 'none' }}
+                              >
+                                <span className="text-sm font-medium text-gray-700">
+                                  {(user.first_name?.[0] || '').toUpperCase()}{(user.last_name?.[0] || '').toUpperCase()}
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-sm font-medium text-gray-700">
+                                {(user.first_name?.[0] || '').toUpperCase()}{(user.last_name?.[0] || '').toUpperCase()}
+                              </span>
+                            </div>
+                          )}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
