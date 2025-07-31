@@ -87,13 +87,10 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
   const currentProfilePictureUrl = user?.profile_picture_url
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Profile Picture</h3>
-      
-      <div className="flex items-start space-x-6">
-        {/* Current/Preview Image */}
-        <div className="flex-shrink-0">
-          <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
+    <div className="flex items-start space-x-4">
+      {/* Current/Preview Image */}
+      <div className="flex-shrink-0">
+        <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200">
             {preview ? (
               <img
                 src={preview}
@@ -149,16 +146,18 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
               </p>
               <div className="flex space-x-3">
                 <button
+                  type="button"
                   onClick={handleUpload}
                   disabled={uploadMutation.isPending}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
-                  {uploadMutation.isPending ? 'Uploading...' : 'Upload Picture'}
+                  {uploadMutation.isPending ? 'Uploading...' : 'Upload'}
                 </button>
                 <button
+                  type="button"
                   onClick={handleCancel}
                   disabled={uploadMutation.isPending}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  className="px-3 py-1.5 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
                   Cancel
                 </button>
@@ -169,28 +168,29 @@ export const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
             <div className="space-y-3">
               <div className="flex space-x-3">
                 <button
+                  type="button"
                   onClick={triggerFileInput}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium"
+                  className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium"
                 >
                   Choose Picture
                 </button>
                 {currentProfilePictureUrl && (
                   <button
+                    type="button"
                     onClick={handleDelete}
                     disabled={deleteMutation.isPending}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                    className="px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                   >
-                    {deleteMutation.isPending ? 'Deleting...' : 'Delete Picture'}
+                    {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
                   </button>
                 )}
               </div>
-              <p className="text-sm text-gray-500">
-                Upload a JPG, JPEG, or PNG file. Maximum size: 5MB.
+              <p className="text-xs text-gray-500">
+                JPG, JPEG, or PNG. Max 5MB.
               </p>
             </div>
           )}
         </div>
-      </div>
     </div>
   )
 }

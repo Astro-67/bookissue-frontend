@@ -6,9 +6,11 @@ import {
   RiUser3Line, 
   RiMailLine, 
   RiPhoneLine, 
-  RiSaveLine
+  RiSaveLine,
+  RiCameraLine
 } from 'react-icons/ri';
 import { useCurrentUser, useUpdateProfile } from '../../../hooks/api';
+import { ProfilePictureUpload } from './ProfilePictureUpload';
 import type { UpdateProfileData } from '../../../types/api';
 
 // Validation schema
@@ -113,7 +115,30 @@ const ProfileForm: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Profile Picture Upload - Only show when editing */}
+        {isEditing && (
+          <div className="space-y-4 pb-6 border-b border-gray-200">
+            <h3 className="text-sm font-medium text-gray-900 flex items-center">
+              <RiCameraLine className="w-4 h-4 mr-2" />
+              Update Profile Picture
+            </h3>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">
+                Upload a new profile picture. Recommended size: 200x200px. Max file size: 5MB.
+              </p>
+              <ProfilePictureUpload />
+            </div>
+          </div>
+        )}
+
+        {/* Personal Information Fields */}
+        <div className={isEditing ? "space-y-6" : "space-y-6"}>
+          <h3 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+            <RiUser3Line className="w-4 h-4 mr-2" />
+            Personal Details
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* First Name */}
           <div>
             <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -221,6 +246,7 @@ const ProfileForm: React.FC = () => {
           {errors.phone_number && (
             <p className="mt-1 text-sm text-red-600">{errors.phone_number.message}</p>
           )}
+        </div>
         </div>
 
         {/* Read-only fields */}

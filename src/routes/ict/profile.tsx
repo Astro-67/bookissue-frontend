@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import ProfileHeader from '../../features/profile/components/ProfileHeader';
 import ProfileForm from '../../features/profile/components/ProfileForm';
 import ChangePasswordForm from '../../features/profile/components/ChangePasswordForm';
-import { ProfilePictureUpload } from '../../features/profile/components/ProfilePictureUpload';
 
 function ICTProfile() {
   return (
@@ -15,19 +14,8 @@ function ICTProfile() {
       {/* Profile Header */}
       <ProfileHeader />
 
-      {/* Profile Picture Upload */}
-      <ProfilePictureUpload />
-
       {/* Profile Form */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Personal Information</h2>
-          <p className="text-sm text-gray-500">Update your personal details and contact information</p>
-        </div>
-        <div className="px-6 py-6">
-          <ProfileForm />
-        </div>
-      </div>
+      <ProfileForm />
 
       {/* Change Password Form */}
       <div className="bg-white shadow rounded-lg">

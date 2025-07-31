@@ -120,6 +120,9 @@ export const useUploadProfilePicture = () => {
       // Invalidate and refetch both profile and currentUser queries
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      // Also force refetch to ensure immediate update
+      queryClient.refetchQueries({ queryKey: ['profile'] });
+      queryClient.refetchQueries({ queryKey: ['currentUser'] });
       toast.success('Profile picture uploaded successfully!');
     },
     onError: (error: any) => {
@@ -140,6 +143,9 @@ export const useDeleteProfilePicture = () => {
       // Invalidate and refetch both profile and currentUser queries
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      // Also force refetch to ensure immediate update
+      queryClient.refetchQueries({ queryKey: ['profile'] });
+      queryClient.refetchQueries({ queryKey: ['currentUser'] });
       toast.success('Profile picture deleted successfully!');
     },
     onError: (error: any) => {
