@@ -43,6 +43,23 @@ export const authApi = {
     return response.data;
   },
 
+  uploadProfilePicture: async (file: File) => {
+    const formData = new FormData();
+    formData.append('profile_picture', file);
+    
+    const response = await api.post('/users/profile/picture/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
+    return response.data;
+  },
+
+  deleteProfilePicture: async () => {
+    const response = await api.delete('/users/profile/picture/');
+    return response.data;
+  },
+
   changePassword: async (passwordData: {
     old_password: string;
     new_password: string;

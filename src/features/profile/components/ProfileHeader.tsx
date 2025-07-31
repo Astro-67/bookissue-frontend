@@ -6,6 +6,7 @@ import {
   RiVerifiedBadgeLine
 } from 'react-icons/ri';
 import { useCurrentUser } from '../../../hooks/api';
+import { getMediaUrl } from '../../../utils/media';
 
 const ProfileHeader: React.FC = () => {
   const { data: user, isLoading } = useCurrentUser();
@@ -80,10 +81,35 @@ const ProfileHeader: React.FC = () => {
       <div className="flex items-center space-x-6">
         {/* Avatar */}
         <div className="relative">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-            <span className="text-2xl font-bold text-white">
-              {getInitials(user.first_name, user.last_name)}
-            </span>
+          <div className="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg">
+            {user.profile_picture_url ? (
+              <img
+                src={getMediaUrl(user.profile_picture_url) || ''}
+                alt={`${user.first_name} ${user.last_name}`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // If image fails to load, hide it and show initials
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `
+                      <div class="w-full h-full flex items-center justify-center">
+                        <span class="text-2xl font-bold text-white">
+                          ${getInitials(user.first_name, user.last_name)}
+                        </span>
+                      </div>
+                    `;
+                  }
+                }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-2xl font-bold text-white">
+                  {getInitials(user.first_name, user.last_name)}
+                </span>
+              </div>
+            )}
           </div>
           {user.is_active && (
             <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">

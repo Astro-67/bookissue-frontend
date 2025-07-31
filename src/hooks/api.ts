@@ -111,6 +111,43 @@ export const useChangePassword = () => {
   });
 };
 
+export const useUploadProfilePicture = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: authApi.uploadProfilePicture,
+    onSuccess: () => {
+      // Invalidate and refetch both profile and currentUser queries
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      toast.success('Profile picture uploaded successfully!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.profile_picture?.[0] || 
+                          error?.response?.data?.message || 
+                          'Failed to upload profile picture.';
+      toast.error(errorMessage);
+    },
+  });
+};
+
+export const useDeleteProfilePicture = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: authApi.deleteProfilePicture,
+    onSuccess: () => {
+      // Invalidate and refetch both profile and currentUser queries
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      toast.success('Profile picture deleted successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Failed to delete profile picture.');
+    },
+  });
+};
+
 // Tickets hooks
 export const useTickets = (params?: { 
   status?: string; 

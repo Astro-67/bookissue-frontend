@@ -29,7 +29,8 @@ const roleConfig = {
     user: {
       name: 'John Doe',
       id: '2024001',
-      avatar: 'JD'
+      avatar: 'JD',
+      profilePicture: undefined
     }
   },
   staff: {
@@ -42,7 +43,8 @@ const roleConfig = {
     user: {
       name: 'Alice Smith',
       id: 'Library Staff',
-      avatar: 'AS'
+      avatar: 'AS',
+      profilePicture: undefined
     }
   },
   ict: {
@@ -56,7 +58,8 @@ const roleConfig = {
     user: {
       name: 'Mike Taylor',
       id: 'ICT Administrator',
-      avatar: 'MT'
+      avatar: 'MT',
+      profilePicture: undefined
     }
   },
   super_admin: {
@@ -70,7 +73,8 @@ const roleConfig = {
     user: {
       name: 'System Administrator',
       id: 'Super Admin',
-      avatar: 'SA'
+      avatar: 'SA',
+      profilePicture: undefined
     }
   }
 }
@@ -104,6 +108,7 @@ export const SharedLayout: React.FC<SharedLayoutProps> = ({ role, children }) =>
     name: user.full_name || `${user.first_name} ${user.last_name}`,
     id: user.student_id || user.email,
     avatar: user.first_name?.[0]?.toUpperCase() + (user.last_name?.[0]?.toUpperCase() || ''),
+    profilePicture: user.profile_picture_url,
   } : config.user;
 
   return (
@@ -126,6 +131,7 @@ export const SharedLayout: React.FC<SharedLayoutProps> = ({ role, children }) =>
           title={config.title}
           userName={displayUser.name}
           userAvatar={displayUser.avatar}
+          userProfilePicture={displayUser.profilePicture}
           role={role}
           onMobileMenuToggle={() => setSidebarOpen(true)}
           onLogout={handleSignOut}

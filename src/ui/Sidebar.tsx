@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from '@tanstack/react-router'
 import { RiBookLine, RiCloseLine, RiLogoutBoxLine } from 'react-icons/ri'
+import { getMediaUrl } from '../utils/media'
 
 interface NavigationItem {
   name: string
@@ -12,6 +13,7 @@ interface User {
   name: string
   id: string
   avatar: string
+  profilePicture?: string
 }
 
 interface SidebarProps {
@@ -90,10 +92,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* User Section */}
         <div className="p-4 border-t border-gray-200 bg-gray-50">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium text-white">
-                {user.avatar}
-              </span>
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
+              {user.profilePicture ? (
+                <img
+                  src={getMediaUrl(user.profilePicture) || ''}
+                  alt={user.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // If image fails to load, hide it and show initials
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `
+                        <span class="text-sm font-medium text-white">
+                          ${user.avatar}
+                        </span>
+                      `;
+                    }
+                  }}
+                />
+              ) : (
+                <span className="text-sm font-medium text-white">
+                  {user.avatar}
+                </span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">

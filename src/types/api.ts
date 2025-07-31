@@ -10,6 +10,8 @@ export interface User {
   phone_number?: string;
   student_id?: string;
   department?: string;
+  profile_picture?: string;
+  profile_picture_url?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
