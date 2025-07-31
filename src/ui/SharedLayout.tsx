@@ -5,8 +5,6 @@ import {
   RiTicketLine, 
   RiUserLine, 
   RiTeamLine, 
-  RiBookLine, 
-  RiBarChartBoxLine, 
   RiGroupLine,
 } from 'react-icons/ri'
 import { Header } from './Header'
@@ -38,10 +36,8 @@ const roleConfig = {
     title: 'Staff Portal',
     navigation: [
       { name: 'Dashboard', href: '/staff/dashboard', icon: RiDashboardLine },
-      { name: 'All Issues', href: '/staff/tickets', icon: RiTicketLine },
-      { name: 'My Assigned', href: '/staff/tickets/assigned', icon: RiTeamLine },
-      { name: 'Book Management', href: '/staff/books', icon: RiBookLine },
-      { name: 'Reports', href: '/staff/reports', icon: RiBarChartBoxLine },
+      { name: 'My Issues', href: '/staff/tickets', icon: RiTicketLine },
+      { name: 'Profile', href: '/staff/profile', icon: RiUserLine },
     ],
     user: {
       name: 'Alice Smith',
