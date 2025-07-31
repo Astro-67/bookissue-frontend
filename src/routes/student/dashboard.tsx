@@ -6,8 +6,7 @@ import {
   RiAlertLine, 
   RiCheckboxCircleLine,
   RiEyeLine,
-  RiAddLine,
-  RiRefreshLine
+  RiAddLine
 } from 'react-icons/ri'
 import { useMemo } from 'react'
 import type { Ticket } from '../../types/api'
@@ -18,7 +17,7 @@ export const Route = createFileRoute('/student/dashboard')({
 
 function RouteComponent() {
   const { data: currentUser } = useCurrentUser()
-  const { data: ticketsData, isLoading, isUpdating } = useRealTimeTickets({
+  const { data: ticketsData, isLoading } = useRealTimeTickets({
     created_by: currentUser?.id
   })
 
@@ -80,19 +79,6 @@ function RouteComponent() {
     }
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'OPEN':
-        return <RiAlertLine className="w-3 h-3" />
-      case 'IN_PROGRESS':
-        return <RiTimeLine className="w-3 h-3" />
-      case 'RESOLVED':
-        return <RiCheckboxCircleLine className="w-3 h-3" />
-      default:
-        return <RiTimeLine className="w-3 h-3" />
-    }
-  }
-
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
@@ -116,45 +102,15 @@ function RouteComponent() {
   return (
     <div className="space-y-6">
       {/* Welcome Card */}
-      <div className="bg-blue-500 rounded-sm shadow-lg p-6 text-white">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold mb-2">
-              Welcome back, {currentUser?.full_name || 'Student'}!
-            </h2>
-            <p className="text-indigo-100">Manage your book requests and track your issued books.</p>
-          </div>
-          <div className="flex items-center space-x-2">
-            {isUpdating && (
-              <RiRefreshLine className="w-5 h-5 text-indigo-200 animate-spin" />
-            )}
-            <Link
-              to="/student/tickets"
-              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-            >
-              <RiAddLine className="w-4 h-4" />
-              <span>New Request</span>
-            </Link>
-          </div>
-        </div>
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg shadow-lg p-6 text-white">
+        <h2 className="text-2xl font-bold mb-2">Student Dashboard</h2>
+        <p className="text-blue-100">
+          Welcome back, {currentUser?.first_name || 'Student'}! Manage your book requests and track your issued books.
+        </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                <RiBookLine className="w-5 h-5 text-white" />
-              </div>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Requests</p>
-              <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
-            </div>
-          </div>
-        </div>
-
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -196,122 +152,132 @@ function RouteComponent() {
             </div>
           </div>
         </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                <RiBookLine className="w-5 h-5 text-white" />
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Total Requests</p>
+              <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-          <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-          <Link
-            to="/student/tickets"
-            className="text-sm text-indigo-600 hover:text-indigo-800 flex items-center space-x-1"
-          >
-            <span>View All</span>
-            <RiEyeLine className="w-4 h-4" />
-          </Link>
-        </div>
-        <div className="p-6">
-          {recentTickets.length === 0 ? (
-            <div className="text-center py-8">
-              <RiBookLine className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No book requests yet</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Get started by creating your first book request.
-              </p>
-              <div className="mt-6">
+      {/* Recent Activity & Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
+            <Link
+              to="/student/tickets"
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
+              View All →
+            </Link>
+          </div>
+          <div className="p-6">
+            {recentTickets.length === 0 ? (
+              <div className="text-center py-8">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <p className="mt-2 text-sm text-gray-500">No book requests yet</p>
                 <Link
-                  to="/student/tickets"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                  to="/student/tickets/new"
+                  className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
-                  <RiAddLine className="w-4 h-4 mr-2" />
-                  Create Request
+                  Create Your First Request
                 </Link>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {recentTickets.map((ticket) => (
-                <div key={ticket.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
-                      {getStatusIcon(ticket.status)}
-                      <span className="ml-1">{ticket.status.replace('_', ' ')}</span>
-                    </span>
-                    <div>
-                      <span className="text-sm font-medium text-gray-900">{ticket.title}</span>
+            ) : (
+              <div className="space-y-4">
+                {recentTickets.slice(0, 3).map((ticket: Ticket) => (
+                  <div key={ticket.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex-1">
+                      <Link
+                        to="/student/tickets/$ticketId"
+                        params={{ ticketId: ticket.id.toString() }}
+                        className="font-medium text-gray-900 hover:text-blue-600"
+                      >
+                        {ticket.title}
+                      </Link>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {ticket.description?.substring(0, 50)}...
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {formatTimeAgo(ticket.updated_at || ticket.created_at)}
+                      </p>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-xs text-gray-400">
-                      {formatTimeAgo(ticket.updated_at || ticket.created_at)}
+                    <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getStatusColor(ticket.status)}`}>
+                      {ticket.status.replace('_', ' ')}
                     </span>
-                    <Link
-                      to="/student/tickets/$ticketId"
-                      params={{ ticketId: ticket.id.toString() }}
-                      className="text-indigo-600 hover:text-indigo-800"
-                    >
-                      <RiEyeLine className="w-4 h-4" />
-                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <Link
+                to="/student/tickets/new"
+                className="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors group"
+              >
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                    <RiAddLine className="w-5 h-5 text-white" />
                   </div>
                 </div>
-              ))}
+                <div className="ml-4">
+                  <p className="font-medium text-gray-900">New Book Request</p>
+                  <p className="text-sm text-gray-500">Request a new book from the library</p>
+                </div>
+              </Link>
+
+              <Link
+                to="/student/tickets"
+                className="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors group"
+              >
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center group-hover:bg-green-600 transition-colors">
+                    <RiEyeLine className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="font-medium text-gray-900">View My Requests</p>
+                  <p className="text-sm text-gray-500">Check status of your submitted requests</p>
+                </div>
+              </Link>
+
+              <Link
+                to="/student/profile"
+                className="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors group"
+              >
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center group-hover:bg-purple-600 transition-colors">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="font-medium text-gray-900">My Profile</p>
+                  <p className="text-sm text-gray-500">Update your account information</p>
+                </div>
+              </Link>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Quick Actions</h3>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              to="/student/tickets"
-              className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-indigo-400 hover:bg-indigo-50 transition-colors group"
-            >
-              <RiAddLine className="w-8 h-8 text-gray-400 group-hover:text-indigo-600" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900 group-hover:text-indigo-900">
-                  New Book Request
-                </p>
-                <p className="text-sm text-gray-500 group-hover:text-indigo-700">
-                  Request a new book from the library
-                </p>
-              </div>
-            </Link>
-
-            <Link
-              to="/student/tickets"
-              search={{ status: 'OPEN' }}
-              className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-red-400 hover:bg-red-50 transition-colors group"
-            >
-              <RiAlertLine className="w-8 h-8 text-gray-400 group-hover:text-red-600" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900 group-hover:text-red-900">
-                  View Open Requests
-                </p>
-                <p className="text-sm text-gray-500 group-hover:text-red-700">
-                  Check your pending book requests
-                </p>
-              </div>
-            </Link>
-
-            <Link
-              to="/student/profile"
-              className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors group"
-            >
-              <RiCheckboxCircleLine className="w-8 h-8 text-gray-400 group-hover:text-green-600" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900 group-hover:text-green-900">
-                  Update Profile
-                </p>
-                <p className="text-sm text-gray-500 group-hover:text-green-700">
-                  Manage your account settings
-                </p>
-              </div>
-            </Link>
           </div>
         </div>
       </div>
