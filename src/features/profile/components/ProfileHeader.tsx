@@ -47,12 +47,27 @@ const ProfileHeader: React.FC = () => {
         return 'bg-green-100 text-green-800 border-green-200';
       case 'ict':
         return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'super_admin':
+        return 'bg-red-100 text-red-800 border-red-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const getRoleDisplayName = (role: string) => {
+    switch (role?.toLowerCase()) {
+      case 'student':
+        return 'Student';
+      case 'staff':
+        return 'Staff Member';
+      case 'ict':
+        return 'ICT Admin';
+      case 'super_admin':
+        return 'Super Admin';
+      default:
+        return role || 'Unknown';
+    }
+  };  const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -85,7 +100,7 @@ const ProfileHeader: React.FC = () => {
             </h1>
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getRoleBadgeColor(user.role)}`}>
               <RiShieldUserLine className="w-3 h-3 mr-1" />
-              {user.role?.toUpperCase()}
+              {getRoleDisplayName(user.role)}
             </span>
           </div>
           

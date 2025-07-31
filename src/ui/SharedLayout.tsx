@@ -68,6 +68,7 @@ const roleConfig = {
       { name: 'Dashboard', href: '/super-admin/dashboard', icon: RiDashboardLine },
       { name: 'All Tickets', href: '/super-admin/tickets', icon: RiTicketLine },
       { name: 'User Management', href: '/super-admin/users', icon: RiGroupLine },
+      { name: 'Profile', href: '/super-admin/profile', icon: RiUserLine },
     ],
     user: {
       name: 'System Administrator',
@@ -128,6 +129,7 @@ export const SharedLayout: React.FC<SharedLayoutProps> = ({ role, children }) =>
           title={config.title}
           userName={displayUser.name}
           userAvatar={displayUser.avatar}
+          role={role}
           onMobileMenuToggle={() => setSidebarOpen(true)}
           onLogout={handleSignOut}
         />

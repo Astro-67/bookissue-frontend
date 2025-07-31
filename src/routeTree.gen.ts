@@ -18,6 +18,7 @@ import { Route as SuperAdminUsersRouteImport } from './routes/super-admin/users'
 import { Route as SuperAdminTicketsRouteImport } from './routes/super-admin/tickets'
 import { Route as SuperAdminStaffRouteImport } from './routes/super-admin/staff'
 import { Route as SuperAdminSettingsRouteImport } from './routes/super-admin/settings'
+import { Route as SuperAdminProfileRouteImport } from './routes/super-admin/profile'
 import { Route as SuperAdminDashboardRouteImport } from './routes/super-admin/dashboard'
 import { Route as SuperAdminLayoutRouteImport } from './routes/super-admin/_layout'
 import { Route as StudentTicketsRouteImport } from './routes/student/tickets'
@@ -100,6 +101,11 @@ const SuperAdminStaffRoute = SuperAdminStaffRouteImport.update({
 const SuperAdminSettingsRoute = SuperAdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => SuperAdminRoute,
+} as any)
+const SuperAdminProfileRoute = SuperAdminProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => SuperAdminRoute,
 } as any)
 const SuperAdminDashboardRoute = SuperAdminDashboardRouteImport.update({
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/student/tickets': typeof StudentTicketsRouteWithChildren
   '/super-admin': typeof SuperAdminLayoutRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/profile': typeof SuperAdminProfileRoute
   '/super-admin/settings': typeof SuperAdminSettingsRoute
   '/super-admin/staff': typeof SuperAdminStaffRoute
   '/super-admin/tickets': typeof SuperAdminTicketsRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/student/profile': typeof StudentProfileRoute
   '/super-admin': typeof SuperAdminLayoutRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/profile': typeof SuperAdminProfileRoute
   '/super-admin/settings': typeof SuperAdminSettingsRoute
   '/super-admin/staff': typeof SuperAdminStaffRoute
   '/super-admin/tickets': typeof SuperAdminTicketsRoute
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/super-admin': typeof SuperAdminRouteWithChildren
   '/super-admin/_layout': typeof SuperAdminLayoutRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/profile': typeof SuperAdminProfileRoute
   '/super-admin/settings': typeof SuperAdminSettingsRoute
   '/super-admin/staff': typeof SuperAdminStaffRoute
   '/super-admin/tickets': typeof SuperAdminTicketsRoute
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/student/tickets'
     | '/super-admin'
     | '/super-admin/dashboard'
+    | '/super-admin/profile'
     | '/super-admin/settings'
     | '/super-admin/staff'
     | '/super-admin/tickets'
@@ -367,6 +377,7 @@ export interface FileRouteTypes {
     | '/student/profile'
     | '/super-admin'
     | '/super-admin/dashboard'
+    | '/super-admin/profile'
     | '/super-admin/settings'
     | '/super-admin/staff'
     | '/super-admin/tickets'
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/super-admin'
     | '/super-admin/_layout'
     | '/super-admin/dashboard'
+    | '/super-admin/profile'
     | '/super-admin/settings'
     | '/super-admin/staff'
     | '/super-admin/tickets'
@@ -504,6 +516,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/super-admin/settings'
       preLoaderRoute: typeof SuperAdminSettingsRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
+    '/super-admin/profile': {
+      id: '/super-admin/profile'
+      path: '/profile'
+      fullPath: '/super-admin/profile'
+      preLoaderRoute: typeof SuperAdminProfileRouteImport
       parentRoute: typeof SuperAdminRoute
     }
     '/super-admin/dashboard': {
@@ -768,6 +787,7 @@ const StudentRouteWithChildren =
 interface SuperAdminRouteChildren {
   SuperAdminLayoutRoute: typeof SuperAdminLayoutRoute
   SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
+  SuperAdminProfileRoute: typeof SuperAdminProfileRoute
   SuperAdminSettingsRoute: typeof SuperAdminSettingsRoute
   SuperAdminStaffRoute: typeof SuperAdminStaffRoute
   SuperAdminTicketsRoute: typeof SuperAdminTicketsRoute
@@ -778,6 +798,7 @@ interface SuperAdminRouteChildren {
 const SuperAdminRouteChildren: SuperAdminRouteChildren = {
   SuperAdminLayoutRoute: SuperAdminLayoutRoute,
   SuperAdminDashboardRoute: SuperAdminDashboardRoute,
+  SuperAdminProfileRoute: SuperAdminProfileRoute,
   SuperAdminSettingsRoute: SuperAdminSettingsRoute,
   SuperAdminStaffRoute: SuperAdminStaffRoute,
   SuperAdminTicketsRoute: SuperAdminTicketsRoute,

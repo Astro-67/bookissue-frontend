@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { RiMenuLine, RiNotificationLine, RiArrowDownSLine, RiUserLine, RiLogoutBoxLine } from 'react-icons/ri'
 
 interface HeaderProps {
   title: string
   userName: string
   userAvatar: string
+  role?: 'student' | 'staff' | 'ict' | 'super_admin'
   onMobileMenuToggle: () => void
   onLogout: () => void
 }
@@ -13,11 +15,23 @@ export const Header: React.FC<HeaderProps> = ({
   title,
   userName,
   userAvatar,
+  role,
   onMobileMenuToggle,
   onLogout
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // Handle profile navigation based on role
+  const handleProfileClick = () => {
+    setDropdownOpen(false);
+    if (role) {
+      // Convert super_admin to super-admin for routing
+      const routeRole = role === 'super_admin' ? 'super-admin' : role
+      router.navigate({ to: `/${routeRole}/profile` })
+    }
+  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -84,10 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <p className="text-xs text-gray-500">Signed in</p>
                   </div>
                   <button
-                    onClick={() => {
-                      // Handle profile click
-                      setDropdownOpen(false);
-                    }}
+                    onClick={handleProfileClick}
                     className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   >
                     <RiUserLine className="mr-3 h-4 w-4" />
