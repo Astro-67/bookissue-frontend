@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from '../../hooks/api'
 import type { User, RegisterData } from '../../types/api'
+import { getMediaUrl } from '../../utils/media'
 import { 
   RiUserAddLine,
   RiUserLine,
@@ -11,25 +12,8 @@ import {
   RiTeamLine,
   RiUserStarLine,
   RiCloseLine,
-  RiSaveLine,
-  RiInformationLine
+  RiSaveLine
 } from 'react-icons/ri'
-
-// Helper function to format dates
-const formatDate = (dateString: string | null | undefined) => {
-  if (!dateString) return 'Never'
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  } catch {
-    return 'Invalid date'
-  }
-}
 
 function SuperAdminUsers() {
   const [selectedRole, setSelectedRole] = useState<string>('all')
@@ -254,16 +238,72 @@ function SuperAdminUsers() {
             <tbody className="bg-white divide-y divide-gray-200">
               {Array.isArray(filteredUsers) && filteredUsers.map((user: User) => {
                 const RoleIcon = getRoleIcon(user.role || 'student')
+                // Debug logging
+                if (user.profile_picture_url || user.profile_picture) {
+                  console.log('User with profile picture:', {
+                    id: user.id,
+                    email: user.email,
+                    profile_picture_url: user.profile_picture_url,
+                    profile_picture: user.profile_picture,
+                    mediaUrl: getMediaUrl(user.profile_picture_url || user.profile_picture)
+                  })
+                }
                 return (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-sm font-medium text-gray-700">
-                              {(user.first_name?.[0] || '').toUpperCase()}{(user.last_name?.[0] || '').toUpperCase()}
-                            </span>
-                          </div>
+                        <div className="flex-shrink-0 h-10 w-10 relative">
+                          {(() => {
+                            const profileUrl = user.profile_picture_url || user.profile_picture;
+                            const mediaUrl = getMediaUrl(profileUrl);
+                            
+                            // Debug logging
+                            console.log('User:', user.email, {
+                              profile_picture_url: user.profile_picture_url,
+                              profile_picture: user.profile_picture,
+                              profileUrl,
+                              mediaUrl
+                            });
+                            
+                            if (mediaUrl) {
+                              return (
+                                <>
+                                  <img
+                                    className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                                    src={mediaUrl}
+                                    alt={`${user.first_name || ''} ${user.last_name || ''}`}
+                                    onLoad={() => console.log('✅ Image loaded:', mediaUrl)}
+                                    onError={(e) => {
+                                      console.log('❌ Image failed to load:', mediaUrl);
+                                      // Hide the broken image and show fallback
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      const fallback = target.nextElementSibling as HTMLElement;
+                                      if (fallback) {
+                                        fallback.style.display = 'flex';
+                                      }
+                                    }}
+                                  />
+                                  <div 
+                                    className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center absolute top-0 left-0"
+                                    style={{ display: 'none' }}
+                                  >
+                                    <span className="text-sm font-medium text-gray-700">
+                                      {(user.first_name?.[0] || '').toUpperCase()}{(user.last_name?.[0] || '').toUpperCase()}
+                                    </span>
+                                  </div>
+                                </>
+                              );
+                            } else {
+                              return (
+                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                  <span className="text-sm font-medium text-gray-700">
+                                    {(user.first_name?.[0] || '').toUpperCase()}{(user.last_name?.[0] || '').toUpperCase()}
+                                  </span>
+                                </div>
+                              );
+                            }
+                          })()}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
@@ -785,6 +825,22 @@ function EditUserModal({
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  // Update form data when user prop changes
+  useEffect(() => {
+    setFormData({
+      email: user.email || '',
+      username: user.username || '',
+      first_name: user.first_name || '',
+      last_name: user.last_name || '',
+      role: user.role || 'student',
+      phone_number: user.phone_number || '',
+      student_id: user.student_id || '',
+      department: user.department || '',
+      is_active: user.is_active !== undefined ? user.is_active : true,
+    })
+    setErrors({})
+  }, [user])
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
@@ -870,7 +926,7 @@ function EditUserModal({
       
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl">
+        <div className="relative w-full max-w-xl bg-white rounded-lg shadow-xl">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -1078,25 +1134,6 @@ function EditUserModal({
                     <p className="text-gray-500">
                       When unchecked, the user will not be able to sign in.
                     </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* User Info */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <RiInformationLine className="h-5 w-5 text-blue-400" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-blue-800">
-                      Account Information
-                    </h3>
-                    <div className="mt-1 text-sm text-blue-700">
-                      <p>User ID: {user.id}</p>
-                      <p>Created: {formatDate(user.created_at)}</p>
-                      <p>Updated: {formatDate(user.updated_at)}</p>
-                    </div>
                   </div>
                 </div>
               </div>
