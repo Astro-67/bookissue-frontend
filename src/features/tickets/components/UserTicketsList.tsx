@@ -5,6 +5,7 @@ import type { Ticket } from '../../../types/api';
 import Table, { type TableColumn } from '../../../ui/Table';
 import Modal from '../../../ui/Modal';
 import CreateTicketForm from './CreateTicketForm';
+import { createPortal } from 'react-dom';
 import { 
   RiAddLine, 
   RiTimeLine,
@@ -24,6 +25,7 @@ interface ActionsDropdownProps {
 
 const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket, baseRoute }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const prefetchTicket = usePrefetchTicket();
@@ -36,27 +38,39 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket, baseRoute }) 
   const toggleDropdown = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.right + window.scrollX - 160 // 160px is dropdown width
+      });
+    }
     setIsOpen(!isOpen);
   };
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      const isClickInsideButton = buttonRef.current?.contains(target);
-      const isClickInsideDropdown = dropdownRef.current?.contains(target);
-      
-      if (!isClickInsideButton && !isClickInsideDropdown) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && 
+          buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
 
+    const handleScroll = () => {
+      setIsOpen(false);
+    };
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
+      window.addEventListener('scroll', handleScroll, true);
     }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll, true);
+    };
   }, [isOpen]);
 
   return (
@@ -71,10 +85,14 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket, baseRoute }) 
         <RiMore2Line className="w-4 h-4" />
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <div
           ref={dropdownRef}
-          className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+          className="fixed z-50 w-44 bg-white rounded-md shadow-lg border border-gray-200"
+          style={{
+            top: `${position.top}px`,
+            left: `${position.left}px`,
+          }}
         >
           <div className="py-1">
             <Link
@@ -100,7 +118,8 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({ ticket, baseRoute }) 
               Edit Issue
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
