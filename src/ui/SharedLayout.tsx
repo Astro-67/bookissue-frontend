@@ -46,7 +46,7 @@ const roleConfig = {
     }
   },
   ict: {
-    title: 'ICT Staff',
+    title: 'ICT Admin',
     navigation: [
       { name: 'Dashboard', href: '/ict/dashboard', icon: RiDashboardLine },
       { name: 'All Issues', href: '/ict/tickets', icon: RiTicketLine },
