@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTicket, useDeleteTicket, useUpdateTicket, useUsers } from '../../../hooks/api';
+import { useQueryClient } from '@tanstack/react-query';
 import TicketComments from '../../../features/tickets/components/TicketComments';
 import { getMediaUrl } from '../../../utils/media';
 import { 
@@ -17,12 +18,13 @@ import {
 
 function SuperAdminTicketDetail() {
   const { ticketId } = Route.useParams();
+  const queryClient = useQueryClient();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedAssignee, setSelectedAssignee] = useState('');
   
-  const { data: ticket, isLoading, error } = useTicket(parseInt(ticketId));
+  const { data: ticket, isLoading, error, refetch: refetchTicket } = useTicket(parseInt(ticketId));
   const { data: usersResponse } = useUsers();
   const deleteTicketMutation = useDeleteTicket();
   const updateTicketMutation = useUpdateTicket();
@@ -51,12 +53,29 @@ function SuperAdminTicketDetail() {
   const handleUpdate = () => {
     const updateData: any = {};
     
-    if (selectedStatus !== ticket?.status) {
+    // Check if status was changed manually
+    const statusChangedManually = selectedStatus !== ticket?.status;
+    
+    // Check if assignee was changed
+    const currentAssigneeId = ticket?.assigned_to?.id?.toString() || '';
+    const assigneeChanged = selectedAssignee !== currentAssigneeId;
+    
+    if (statusChangedManually) {
       updateData.status = selectedStatus;
     }
     
-    if (selectedAssignee !== (ticket?.assigned_to?.id?.toString() || '')) {
-      updateData.assigned_to = selectedAssignee ? parseInt(selectedAssignee) : undefined;
+    if (assigneeChanged) {
+      if (selectedAssignee && selectedAssignee !== '') {
+        updateData.assigned_to_id = parseInt(selectedAssignee);
+      } else {
+        updateData.assigned_to_id = null;
+      }
+      
+      // If assigning to someone new (not unassigning), set status to IN_PROGRESS unless manually changed
+      if (selectedAssignee && selectedAssignee !== '' && !statusChangedManually) {
+        updateData.status = 'IN_PROGRESS';
+        setSelectedStatus('IN_PROGRESS');
+      }
     }
 
     if (Object.keys(updateData).length > 0) {
@@ -64,8 +83,28 @@ function SuperAdminTicketDetail() {
         ticketId: parseInt(ticketId),
         data: updateData
       }, {
-        onSuccess: () => {
+        onSuccess: async () => {
+          // Update local state immediately with the sent data
+          if (updateData.status) {
+            setSelectedStatus(updateData.status);
+          }
+          if (assigneeChanged) {
+            const newAssigneeId = updateData.assigned_to_id ? updateData.assigned_to_id.toString() : '';
+            setSelectedAssignee(newAssigneeId);
+          }
+          
           setIsEditing(false);
+          
+          // Small delay to ensure backend has processed the change
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Clear cache and refetch data
+          queryClient.clear();
+          await Promise.all([
+            queryClient.refetchQueries({ queryKey: ['tickets'], type: 'all' }),
+            queryClient.refetchQueries({ queryKey: ['tickets', parseInt(ticketId)], type: 'all' }),
+            refetchTicket()
+          ]);
         }
       });
     } else {
@@ -192,15 +231,15 @@ function SuperAdminTicketDetail() {
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {getStatusIcon(ticket.status)}
+              {getStatusIcon(selectedStatus || ticket.status)}
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{ticket.title}</h1>
                 <p className="text-sm text-gray-500">Ticket #{ticket.id}</p>
               </div>
             </div>
             {!isEditing ? (
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(ticket.status)}`}>
-                {ticket.status.replace('_', ' ')}
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(selectedStatus || ticket.status)}`}>
+                {(selectedStatus || ticket.status).replace('_', ' ')}
               </span>
             ) : (
               <select
@@ -276,9 +315,18 @@ function SuperAdminTicketDetail() {
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       {!isEditing ? (
-                        ticket.assigned_to ? 
-                          `${ticket.assigned_to.first_name || ''} ${ticket.assigned_to.last_name || ''}`.trim() || 
-                          ticket.assigned_to.email : 'Unassigned'
+                        (() => {
+                          // Use selectedAssignee state for display to ensure UI updates
+                          const assigneeId = selectedAssignee || (ticket.assigned_to?.id?.toString() || '');
+                          if (assigneeId) {
+                            const assignedUser = users.find((u: any) => u.id.toString() === assigneeId);
+                            if (assignedUser) {
+                              const displayName = `${assignedUser.first_name || ''} ${assignedUser.last_name || ''}`.trim() || assignedUser.email;
+                              return displayName;
+                            }
+                          }
+                          return 'Unassigned';
+                        })()
                       ) : (
                         <select
                           value={selectedAssignee}
