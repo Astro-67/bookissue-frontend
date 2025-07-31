@@ -34,6 +34,7 @@ import { Route as IctDashboardRouteImport } from './routes/ict/dashboard'
 import { Route as IctAssignedTicketsRouteImport } from './routes/ict/assigned-tickets'
 import { Route as IctLayoutRouteImport } from './routes/ict/_layout'
 import { Route as StudentTicketsIndexRouteImport } from './routes/student/tickets/index'
+import { Route as SuperAdminTicketTicketIdRouteImport } from './routes/super-admin/ticket/$ticketId'
 import { Route as StudentTicketsNewRouteImport } from './routes/student/tickets/new'
 import { Route as StudentTicketsTicketIdRouteImport } from './routes/student/tickets/$ticketId'
 import { Route as StaffTicketsAssignedRouteImport } from './routes/staff/tickets/assigned'
@@ -177,6 +178,12 @@ const StudentTicketsIndexRoute = StudentTicketsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => StudentTicketsRoute,
 } as any)
+const SuperAdminTicketTicketIdRoute =
+  SuperAdminTicketTicketIdRouteImport.update({
+    id: '/ticket/$ticketId',
+    path: '/ticket/$ticketId',
+    getParentRoute: () => SuperAdminRoute,
+  } as any)
 const StudentTicketsNewRoute = StudentTicketsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -237,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/staff/tickets/assigned': typeof StaffTicketsAssignedRoute
   '/student/tickets/$ticketId': typeof StudentTicketsTicketIdRoute
   '/student/tickets/new': typeof StudentTicketsNewRoute
+  '/super-admin/ticket/$ticketId': typeof SuperAdminTicketTicketIdRoute
   '/student/tickets/': typeof StudentTicketsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -267,6 +275,7 @@ export interface FileRoutesByTo {
   '/staff/tickets/assigned': typeof StaffTicketsAssignedRoute
   '/student/tickets/$ticketId': typeof StudentTicketsTicketIdRoute
   '/student/tickets/new': typeof StudentTicketsNewRoute
+  '/super-admin/ticket/$ticketId': typeof SuperAdminTicketTicketIdRoute
   '/student/tickets': typeof StudentTicketsIndexRoute
 }
 export interface FileRoutesById {
@@ -303,6 +312,7 @@ export interface FileRoutesById {
   '/staff/tickets/assigned': typeof StaffTicketsAssignedRoute
   '/student/tickets/$ticketId': typeof StudentTicketsTicketIdRoute
   '/student/tickets/new': typeof StudentTicketsNewRoute
+  '/super-admin/ticket/$ticketId': typeof SuperAdminTicketTicketIdRoute
   '/student/tickets/': typeof StudentTicketsIndexRoute
 }
 export interface FileRouteTypes {
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/staff/tickets/assigned'
     | '/student/tickets/$ticketId'
     | '/student/tickets/new'
+    | '/super-admin/ticket/$ticketId'
     | '/student/tickets/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -366,6 +377,7 @@ export interface FileRouteTypes {
     | '/staff/tickets/assigned'
     | '/student/tickets/$ticketId'
     | '/student/tickets/new'
+    | '/super-admin/ticket/$ticketId'
     | '/student/tickets'
   id:
     | '__root__'
@@ -401,6 +413,7 @@ export interface FileRouteTypes {
     | '/staff/tickets/assigned'
     | '/student/tickets/$ticketId'
     | '/student/tickets/new'
+    | '/super-admin/ticket/$ticketId'
     | '/student/tickets/'
   fileRoutesById: FileRoutesById
 }
@@ -605,6 +618,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentTicketsIndexRouteImport
       parentRoute: typeof StudentTicketsRoute
     }
+    '/super-admin/ticket/$ticketId': {
+      id: '/super-admin/ticket/$ticketId'
+      path: '/ticket/$ticketId'
+      fullPath: '/super-admin/ticket/$ticketId'
+      preLoaderRoute: typeof SuperAdminTicketTicketIdRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
     '/student/tickets/new': {
       id: '/student/tickets/new'
       path: '/new'
@@ -752,6 +772,7 @@ interface SuperAdminRouteChildren {
   SuperAdminStaffRoute: typeof SuperAdminStaffRoute
   SuperAdminTicketsRoute: typeof SuperAdminTicketsRoute
   SuperAdminUsersRoute: typeof SuperAdminUsersRoute
+  SuperAdminTicketTicketIdRoute: typeof SuperAdminTicketTicketIdRoute
 }
 
 const SuperAdminRouteChildren: SuperAdminRouteChildren = {
@@ -761,6 +782,7 @@ const SuperAdminRouteChildren: SuperAdminRouteChildren = {
   SuperAdminStaffRoute: SuperAdminStaffRoute,
   SuperAdminTicketsRoute: SuperAdminTicketsRoute,
   SuperAdminUsersRoute: SuperAdminUsersRoute,
+  SuperAdminTicketTicketIdRoute: SuperAdminTicketTicketIdRoute,
 }
 
 const SuperAdminRouteWithChildren = SuperAdminRoute._addFileChildren(

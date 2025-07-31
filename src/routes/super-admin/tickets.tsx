@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useRealTimeTickets } from '../../hooks/api'
+import { useRealTimeTickets, useDeleteTicket } from '../../hooks/api'
 import type { Ticket } from '../../types/api'
 import { 
   RiEyeLine,
@@ -12,6 +12,8 @@ import {
 function SuperAdminTickets() {
   const { data: ticketsResponse, isLoading } = useRealTimeTickets({})
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null)
+  const deleteTicketMutation = useDeleteTicket()
 
   // Handle different API response formats
   const tickets = Array.isArray(ticketsResponse) 
@@ -22,6 +24,14 @@ function SuperAdminTickets() {
     const statusMatch = selectedStatus === 'all' || ticket.status === selectedStatus
     return statusMatch
   }) || []
+
+  const handleDeleteTicket = (ticketId: number) => {
+    deleteTicketMutation.mutate(ticketId, {
+      onSuccess: () => {
+        setShowDeleteConfirm(null)
+      }
+    })
+  }
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -150,7 +160,7 @@ function SuperAdminTickets() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {ticket.assigned_to 
-                      ? `${ticket.assigned_to.first_name || ''} ${ticket.assigned_to.last_name || ''}`
+                      ? `${ticket.assigned_to.first_name || ''} ${ticket.assigned_to.last_name || ''}`.trim() || ticket.assigned_to.email
                       : 'Unassigned'
                     }
                   </td>
@@ -158,10 +168,19 @@ function SuperAdminTickets() {
                     {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900" title="View Ticket">
+                    <Link
+                      to="/super-admin/ticket/$ticketId"
+                      params={{ ticketId: ticket.id.toString() }}
+                      className="text-blue-600 hover:text-blue-900 inline-flex items-center"
+                      title="View Ticket"
+                    >
                       <RiEyeLine className="h-4 w-4" />
-                    </button>
-                    <button className="text-red-600 hover:text-red-900" title="Delete Ticket">
+                    </Link>
+                    <button 
+                      onClick={() => setShowDeleteConfirm(ticket.id)}
+                      className="text-red-600 hover:text-red-900" 
+                      title="Delete Ticket"
+                    >
                       <RiDeleteBinLine className="h-4 w-4" />
                     </button>
                   </td>
@@ -180,6 +199,36 @@ function SuperAdminTickets() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3 text-center">
+              <RiDeleteBinLine className="mx-auto h-12 w-12 text-red-500" />
+              <h3 className="text-lg font-medium text-gray-900 mt-2">Delete Ticket</h3>
+              <p className="text-sm text-gray-500 mt-2">
+                Are you sure you want to delete ticket #{showDeleteConfirm}? This action cannot be undone.
+              </p>
+              <div className="flex justify-center space-x-3 mt-4">
+                <button
+                  onClick={() => setShowDeleteConfirm(null)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDeleteTicket(showDeleteConfirm)}
+                  disabled={deleteTicketMutation.isPending}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+                >
+                  {deleteTicketMutation.isPending ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
