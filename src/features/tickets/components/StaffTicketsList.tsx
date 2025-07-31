@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { useTickets, usePrefetchTicket } from '../../../hooks/api';
+import { useRealTimeTickets, usePrefetchTicket } from '../../../hooks/api';
 import type { Ticket } from '../../../types/api';
 import Table, { type TableColumn } from '../../../ui/Table';
 import Modal from '../../../ui/Modal';
@@ -128,7 +128,7 @@ const StaffTicketsList: React.FC = () => {
     search: ''
   });
   
-  const { data: ticketsData, isLoading, error, refetch } = useTickets(filters);
+  const { data: ticketsData, isLoading, error } = useRealTimeTickets(filters);
 
   // Handle both array and paginated response
   const tickets = React.useMemo(() => {
@@ -149,7 +149,7 @@ const StaffTicketsList: React.FC = () => {
 
   const handleCreateSuccess = () => {
     setIsCreateModalOpen(false);
-    refetch();
+    // Real-time updates will handle the refresh automatically
   };
 
   const getStatusIcon = (status: string) => {
@@ -168,13 +168,13 @@ const StaffTicketsList: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'OPEN':
-        return 'text-red-600 bg-red-50 border-red-200';
+        return 'bg-red-100 text-red-800 border-red-200';
       case 'IN_PROGRESS':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'RESOLVED':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-200';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 

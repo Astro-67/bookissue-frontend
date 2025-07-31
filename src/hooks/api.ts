@@ -118,16 +118,24 @@ export const useTickets = (params?: {
   created_by?: number;
   search?: string;
 }) => {
-  return useQuery({
+  console.log('useTickets hook called with params:', params, 'at', new Date().toLocaleTimeString());
+  
+  const query = useQuery({
     queryKey: ['tickets', params],
     queryFn: () => ticketsApi.getTickets(params),
-    enabled: true, // Always enable the query - params are optional
-    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes (formerly cacheTime)
-    refetchOnWindowFocus: true, // Refetch when user comes back to the tab
-    refetchOnMount: false, // Don't refetch on mount if data is still fresh
-    placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
+    staleTime: 0, // Always consider data stale for fresh fetches
+    refetchInterval: 5000, // Poll every 5 seconds for updates
+    refetchIntervalInBackground: true, // Continue polling in background
   });
+  
+  // Debug logging
+  useEffect(() => {
+    if (query.data) {
+      console.log('useTickets data updated:', query.data?.results?.length, 'tickets at', new Date().toLocaleTimeString());
+    }
+  }, [query.data]);
+  
+  return query;
 };
 
 export const useTicket = (id: number) => {
@@ -135,9 +143,9 @@ export const useTicket = (id: number) => {
     queryKey: ['tickets', id],
     queryFn: () => ticketsApi.getTicket(id),
     enabled: !!id,
-    staleTime: 1 * 60 * 1000, // Consider fresh for 1 minute
+    staleTime: 0, // Always consider data stale for immediate updates
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
-    refetchOnWindowFocus: false, // Don't refetch when window gains focus
+    refetchOnWindowFocus: true, // Refetch when window gains focus for latest data
     refetchOnMount: false, // Don't refetch on mount if data is fresh
   });
 };
@@ -177,21 +185,31 @@ export const useUpdateTicket = () => {
   return useMutation({
     mutationFn: ({ ticketId, data }: { ticketId: number; data: any }) => 
       ticketsApi.updateTicket(ticketId, data),
-    onSuccess: (updatedTicket, variables) => {
+    onSuccess: async (updatedTicket, variables) => {
+      console.log('Ticket updated successfully, refreshing cache...', variables);
+      
       // Update the specific ticket in cache if we get updated data back
       if (updatedTicket) {
         queryClient.setQueryData(['tickets', variables.ticketId], updatedTicket);
       }
       
-      // Invalidate ticket lists but keep cached data until new data arrives
-      queryClient.invalidateQueries({ 
-        queryKey: ['tickets'], 
-        refetchType: 'none' // Don't refetch immediately, just mark as stale
-      });
+      // Remove all ticket queries from cache to force fresh data
+      queryClient.removeQueries({ queryKey: ['tickets'] });
       
+      // Small delay to ensure cache is cleared
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Invalidate all ticket-related queries
+      await queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      
+      // Force immediate refetch of all ticket queries
+      await queryClient.refetchQueries({ queryKey: ['tickets'], type: 'all' });
+      
+      console.log('Cache refresh completed');
       toast.success('Ticket updated successfully!');
     },
     onError: (error: any) => {
+      console.error('Ticket update failed:', error);
       toast.error(error?.response?.data?.message || 'Failed to update ticket.');
     },
   });
@@ -204,10 +222,15 @@ export const useAssignTicket = () => {
     mutationFn: ({ ticketId, assignedToId }: { ticketId: number; assignedToId: number }) => 
       ticketsApi.assignTicket(ticketId, assignedToId),
     onSuccess: (_, variables) => {
+      // Remove all cached ticket data to force fresh fetch
+      queryClient.removeQueries({ queryKey: ['tickets'] });
+      
       // Invalidate and refetch all ticket queries for immediate updates
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['tickets', variables.ticketId] });
-      queryClient.refetchQueries({ queryKey: ['tickets'] });
+      
+      // Force refetch all ticket queries immediately
+      queryClient.refetchQueries({ queryKey: ['tickets'], type: 'all' });
       queryClient.refetchQueries({ queryKey: ['tickets', variables.ticketId] });
       toast.success('Ticket assigned successfully!');
     },

@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { useTickets } from '../../hooks/api'
+import { useRealTimeTickets } from '../../hooks/api'
 import type { Ticket } from '../../types/api'
 import { 
   RiEyeLine,
@@ -10,7 +10,7 @@ import {
 } from 'react-icons/ri'
 
 function SuperAdminTickets() {
-  const { data: ticketsResponse, isLoading } = useTickets({})
+  const { data: ticketsResponse, isLoading } = useRealTimeTickets({})
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
 
   // Handle different API response formats
@@ -19,22 +19,20 @@ function SuperAdminTickets() {
     : ticketsResponse?.results || ticketsResponse?.data || []
 
   const filteredTickets = tickets?.filter((ticket: Ticket) => {
-    const statusMatch = selectedStatus === 'all' || ticket.status.toLowerCase() === selectedStatus
+    const statusMatch = selectedStatus === 'all' || ticket.status === selectedStatus
     return statusMatch
   }) || []
 
   const getStatusBadgeColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'open':
-        return 'bg-blue-100 text-blue-800'
-      case 'in_progress':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'resolved':
-        return 'bg-green-100 text-green-800'
-      case 'closed':
-        return 'bg-gray-100 text-gray-800'
+    switch (status) {
+      case 'OPEN':
+        return 'bg-red-100 text-red-800 border-red-200'
+      case 'IN_PROGRESS':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'RESOLVED':
+        return 'bg-green-100 text-green-800 border-green-200'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800 border-gray-200'
     }
   }
 
@@ -85,9 +83,9 @@ function SuperAdminTickets() {
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
               >
                 <option value="all">All Status</option>
-                <option value="open">Open</option>
-                <option value="in_progress">In Progress</option>
-                <option value="resolved">Resolved</option>
+                <option value="OPEN">Open</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="RESOLVED">Resolved</option>
               </select>
             </div>
             <div className="sm:col-span-3">
@@ -146,8 +144,8 @@ function SuperAdminTickets() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(ticket.status)}`}>
-                      {ticket.status.replace('_', ' ').toUpperCase()}
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusBadgeColor(ticket.status)}`}>
+                      {ticket.status.replace('_', ' ')}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

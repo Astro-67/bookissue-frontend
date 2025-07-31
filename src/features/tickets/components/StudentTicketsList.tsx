@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { useTickets, usePrefetchTicket } from '../../../hooks/api';
+import { useRealTimeTickets, usePrefetchTicket } from '../../../hooks/api';
 import type { Ticket } from '../../../types/api';
 import Table, { type TableColumn } from '../../../ui/Table';
 import Modal from '../../../ui/Modal';
@@ -113,7 +113,7 @@ const StudentTicketsList: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Fetch tickets with filters
-  const { data: tickets, isLoading, error } = useTickets({
+  const { data: tickets, isLoading, error } = useRealTimeTickets({
     search: searchTerm || undefined,
     status: statusFilter || undefined,
   });
@@ -121,13 +121,13 @@ const StudentTicketsList: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'OPEN':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 border-red-200';
       case 'IN_PROGRESS':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'RESOLVED':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 border-green-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -216,7 +216,7 @@ const StudentTicketsList: React.FC = () => {
       sortable: true,
       width: '140px',
       render: (value) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(value)}`}>
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(value)}`}>
           {getStatusIcon(value)}
           <span className="ml-1">{value.replace('_', ' ')}</span>
         </span>

@@ -29,6 +29,17 @@ const ICTTicketsList: React.FC = () => {
   // Enable real-time notifications for ICT users
   useRealTimeNotifications();
 
+  // Debug logging
+  React.useEffect(() => {
+    console.log('ICT Tickets Data Updated:', {
+      ticketsCount: ticketsData?.results?.length || (Array.isArray(ticketsData) ? ticketsData.length : 0),
+      isLoading,
+      isUpdating,
+      lastUpdated: lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'never',
+      timestamp: new Date().toLocaleTimeString()
+    });
+  }, [ticketsData, isLoading, isUpdating, lastUpdated]);
+
   // Handle both array and paginated response
   const tickets = React.useMemo(() => {
     if (!ticketsData) return [];
