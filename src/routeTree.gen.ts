@@ -24,6 +24,7 @@ import { Route as SuperAdminDashboardRouteImport } from './routes/super-admin/da
 import { Route as SuperAdminLayoutRouteImport } from './routes/super-admin/_layout'
 import { Route as StudentTicketsRouteImport } from './routes/student/tickets'
 import { Route as StudentProfileRouteImport } from './routes/student/profile'
+import { Route as StudentNotificationsRouteImport } from './routes/student/notifications'
 import { Route as StudentDashboardRouteImport } from './routes/student/dashboard'
 import { Route as StudentLayoutRouteImport } from './routes/student/_layout'
 import { Route as StaffTicketsRouteImport } from './routes/staff/tickets'
@@ -137,6 +138,11 @@ const StudentTicketsRoute = StudentTicketsRouteImport.update({
 const StudentProfileRoute = StudentProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentNotificationsRoute = StudentNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => StudentRoute,
 } as any)
 const StudentDashboardRoute = StudentDashboardRouteImport.update({
@@ -281,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/staff/tickets': typeof StaffTicketsRouteWithChildren
   '/student': typeof StudentLayoutRoute
   '/student/dashboard': typeof StudentDashboardRoute
+  '/student/notifications': typeof StudentNotificationsRoute
   '/student/profile': typeof StudentProfileRoute
   '/student/tickets': typeof StudentTicketsRouteWithChildren
   '/super-admin': typeof SuperAdminLayoutRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByTo {
   '/staff/profile': typeof StaffProfileRoute
   '/student': typeof StudentLayoutRoute
   '/student/dashboard': typeof StudentDashboardRoute
+  '/student/notifications': typeof StudentNotificationsRoute
   '/student/profile': typeof StudentProfileRoute
   '/super-admin': typeof SuperAdminLayoutRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
@@ -363,6 +371,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/student/_layout': typeof StudentLayoutRoute
   '/student/dashboard': typeof StudentDashboardRoute
+  '/student/notifications': typeof StudentNotificationsRoute
   '/student/profile': typeof StudentProfileRoute
   '/student/tickets': typeof StudentTicketsRouteWithChildren
   '/super-admin': typeof SuperAdminRouteWithChildren
@@ -406,6 +415,7 @@ export interface FileRouteTypes {
     | '/staff/tickets'
     | '/student'
     | '/student/dashboard'
+    | '/student/notifications'
     | '/student/profile'
     | '/student/tickets'
     | '/super-admin'
@@ -445,6 +455,7 @@ export interface FileRouteTypes {
     | '/staff/profile'
     | '/student'
     | '/student/dashboard'
+    | '/student/notifications'
     | '/student/profile'
     | '/super-admin'
     | '/super-admin/dashboard'
@@ -487,6 +498,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/student/_layout'
     | '/student/dashboard'
+    | '/student/notifications'
     | '/student/profile'
     | '/student/tickets'
     | '/super-admin'
@@ -640,6 +652,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/student/profile'
       preLoaderRoute: typeof StudentProfileRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/notifications': {
+      id: '/student/notifications'
+      path: '/notifications'
+      fullPath: '/student/notifications'
+      preLoaderRoute: typeof StudentNotificationsRouteImport
       parentRoute: typeof StudentRoute
     }
     '/student/dashboard': {
@@ -913,6 +932,7 @@ const StudentTicketsRouteWithChildren = StudentTicketsRoute._addFileChildren(
 interface StudentRouteChildren {
   StudentLayoutRoute: typeof StudentLayoutRoute
   StudentDashboardRoute: typeof StudentDashboardRoute
+  StudentNotificationsRoute: typeof StudentNotificationsRoute
   StudentProfileRoute: typeof StudentProfileRoute
   StudentTicketsRoute: typeof StudentTicketsRouteWithChildren
 }
@@ -920,6 +940,7 @@ interface StudentRouteChildren {
 const StudentRouteChildren: StudentRouteChildren = {
   StudentLayoutRoute: StudentLayoutRoute,
   StudentDashboardRoute: StudentDashboardRoute,
+  StudentNotificationsRoute: StudentNotificationsRoute,
   StudentProfileRoute: StudentProfileRoute,
   StudentTicketsRoute: StudentTicketsRouteWithChildren,
 }

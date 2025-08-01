@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useRouter } from '@tanstack/react-router';
 import { NotificationIcon } from '../../../ui/Icons';
 import { useUnreadCount, useUnreadNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '../../../hooks/api';
 import { CheckIcon } from '../../../ui/Icons';
@@ -21,6 +21,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   const { data: notifications, isLoading, error } = useUnreadNotifications();
   const markAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();
+  const router = useRouter();
 
   const handleMarkAsRead = async (notificationId: number, event: React.MouseEvent) => {
     event.preventDefault();
@@ -46,10 +47,36 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   };
 
   const getNotificationLink = (notification: Notification) => {
+    const currentPath = router.state.location.pathname;
+    
+    // Determine user role from current path
+    let userRole = 'staff';
+    if (currentPath.includes('/ict/')) {
+      userRole = 'ict';
+    } else if (currentPath.includes('/super-admin/')) {
+      userRole = 'super-admin';
+    } else if (currentPath.includes('/student/')) {
+      userRole = 'student';
+    }
+    
     if (notification.ticket_id) {
-      return `/staff/tickets/${notification.ticket_id}`;
+      return `/${userRole}/tickets/${notification.ticket_id}`;
     }
     return '#';
+  };
+
+  const getViewAllNotificationsLink = () => {
+    const currentPath = router.state.location.pathname;
+    
+    // Determine user role from current path
+    if (currentPath.includes('/ict/')) {
+      return '/ict/notifications';
+    } else if (currentPath.includes('/super-admin/')) {
+      return '/super-admin/notifications';
+    } else if (currentPath.includes('/student/')) {
+      return '/student/notifications';
+    }
+    return '/staff/notifications';
   };
 
   if (!isOpen) return null;
@@ -137,7 +164,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       {notifications && notifications.length > 0 && (
         <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
           <Link
-            to="/staff/notifications"
+            to={getViewAllNotificationsLink()}
             onClick={onClose}
             className="text-sm text-blue-600 hover:text-blue-800 font-medium"
           >

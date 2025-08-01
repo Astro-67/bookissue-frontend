@@ -25,6 +25,7 @@ const roleConfig = {
     navigation: [
       { name: 'Dashboard', href: '/student/dashboard', icon: RiDashboardLine },
       { name: 'My Issues', href: '/student/tickets', icon: RiTicketLine },
+      { name: 'Notifications', href: '/student/notifications', icon: NotificationIcon },
       { name: 'Profile', href: '/student/profile', icon: RiUserLine },
     ],
     user: {
