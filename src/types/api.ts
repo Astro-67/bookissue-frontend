@@ -115,3 +115,26 @@ export interface Comment {
 export interface CreateCommentData {
   message: string;
 }
+
+// Notification types
+export interface Notification {
+  id: number;
+  user: number;
+  title: string;
+  message: string;
+  notification_type: 'ticket_status' | 'new_comment' | 'assignment' | 'general';
+  is_read: boolean;
+  ticket_id?: number;
+  comment_id?: number;
+  created_at: string;
+  time_ago: string;
+}
+
+export interface MarkNotificationReadData {
+  notification_ids: number[];
+}
+
+export interface NotificationFilters {
+  is_read?: boolean;
+  notification_type?: string;
+}

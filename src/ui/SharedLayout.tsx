@@ -7,6 +7,7 @@ import {
   RiTeamLine, 
   RiGroupLine,
 } from 'react-icons/ri'
+import { NotificationIcon } from './Icons'
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { Sidebar } from './Sidebar'
@@ -38,6 +39,7 @@ const roleConfig = {
     navigation: [
       { name: 'Dashboard', href: '/staff/dashboard', icon: RiDashboardLine },
       { name: 'My Issues', href: '/staff/tickets', icon: RiTicketLine },
+      { name: 'Notifications', href: '/staff/notifications', icon: NotificationIcon },
       { name: 'Profile', href: '/staff/profile', icon: RiUserLine },
     ],
     user: {
@@ -53,6 +55,7 @@ const roleConfig = {
       { name: 'Dashboard', href: '/ict/dashboard', icon: RiDashboardLine },
       { name: 'All Issues', href: '/ict/tickets', icon: RiTicketLine },
       { name: 'My Assigned', href: '/ict/assigned-tickets', icon: RiTeamLine },
+      { name: 'Notifications', href: '/ict/notifications', icon: NotificationIcon },
       { name: 'Profile', href: '/ict/profile', icon: RiUserLine },
     ],
     user: {
@@ -68,6 +71,7 @@ const roleConfig = {
       { name: 'Dashboard', href: '/super-admin/dashboard', icon: RiDashboardLine },
       { name: 'All Tickets', href: '/super-admin/tickets', icon: RiTicketLine },
       { name: 'User Management', href: '/super-admin/users', icon: RiGroupLine },
+      { name: 'Notifications', href: '/super-admin/notifications', icon: NotificationIcon },
       { name: 'Profile', href: '/super-admin/profile', icon: RiUserLine },
     ],
     user: {

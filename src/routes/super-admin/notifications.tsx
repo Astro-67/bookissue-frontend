@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { NotificationList } from '../../features/notifications/components';
 
-export const Route = createFileRoute('/ict/notifications')({
+export const Route = createFileRoute('/super-admin/notifications')({
   component: NotificationsPage,
 });
 

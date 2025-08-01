@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { authApi, ticketsApi, commentsApi, usersApi } from '../lib/api-services';
+import { authApi, ticketsApi, commentsApi, usersApi, notificationsApi } from '../lib/api-services';
 
 // Auth hooks
 export const useLogin = () => {
@@ -604,5 +604,81 @@ export const useUserStats = () => {
     queryKey: ['userStats'],
     queryFn: usersApi.getUserStats,
     staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+// Notification hooks
+export const useNotifications = (params?: {
+  is_read?: boolean;
+  notification_type?: string;
+  page?: number;
+  page_size?: number;
+}) => {
+  return useQuery({
+    queryKey: ['notifications', params],
+    queryFn: () => notificationsApi.getNotifications(params),
+    staleTime: 30 * 1000, // 30 seconds
+  });
+};
+
+export const useUnreadNotifications = () => {
+  return useQuery({
+    queryKey: ['notifications', 'unread'],
+    queryFn: notificationsApi.getUnreadNotifications,
+    staleTime: 30 * 1000, // 30 seconds
+  });
+};
+
+export const useUnreadCount = () => {
+  return useQuery({
+    queryKey: ['notifications', 'unread-count'],
+    queryFn: notificationsApi.getUnreadCount,
+    staleTime: 30 * 1000, // 30 seconds
+    refetchInterval: 60 * 1000, // Refetch every minute
+  });
+};
+
+export const useMarkNotificationAsRead = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: notificationsApi.markAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast.success('Notification marked as read.');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Failed to mark notification as read.');
+    },
+  });
+};
+
+export const useMarkAllNotificationsAsRead = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: notificationsApi.markAllAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast.success('All notifications marked as read.');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Failed to mark all notifications as read.');
+    },
+  });
+};
+
+export const useDeleteNotification = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: notificationsApi.deleteNotification,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      toast.success('Notification deleted successfully.');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || 'Failed to delete notification.');
+    },
   });
 };

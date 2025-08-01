@@ -19,6 +19,7 @@ import { Route as SuperAdminTicketsRouteImport } from './routes/super-admin/tick
 import { Route as SuperAdminStaffRouteImport } from './routes/super-admin/staff'
 import { Route as SuperAdminSettingsRouteImport } from './routes/super-admin/settings'
 import { Route as SuperAdminProfileRouteImport } from './routes/super-admin/profile'
+import { Route as SuperAdminNotificationsRouteImport } from './routes/super-admin/notifications'
 import { Route as SuperAdminDashboardRouteImport } from './routes/super-admin/dashboard'
 import { Route as SuperAdminLayoutRouteImport } from './routes/super-admin/_layout'
 import { Route as StudentTicketsRouteImport } from './routes/student/tickets'
@@ -27,6 +28,7 @@ import { Route as StudentDashboardRouteImport } from './routes/student/dashboard
 import { Route as StudentLayoutRouteImport } from './routes/student/_layout'
 import { Route as StaffTicketsRouteImport } from './routes/staff/tickets'
 import { Route as StaffProfileRouteImport } from './routes/staff/profile'
+import { Route as StaffNotificationsRouteImport } from './routes/staff/notifications'
 import { Route as StaffDashboardRouteImport } from './routes/staff/dashboard'
 import { Route as StaffAssignedTicketsRouteImport } from './routes/staff/assigned-tickets'
 import { Route as StaffLayoutRouteImport } from './routes/staff/_layout'
@@ -113,6 +115,11 @@ const SuperAdminProfileRoute = SuperAdminProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => SuperAdminRoute,
 } as any)
+const SuperAdminNotificationsRoute = SuperAdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SuperAdminRoute,
+} as any)
 const SuperAdminDashboardRoute = SuperAdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -149,6 +156,11 @@ const StaffTicketsRoute = StaffTicketsRouteImport.update({
 const StaffProfileRoute = StaffProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffNotificationsRoute = StaffNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => StaffRoute,
 } as any)
 const StaffDashboardRoute = StaffDashboardRouteImport.update({
@@ -264,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/staff': typeof StaffLayoutRoute
   '/staff/assigned-tickets': typeof StaffAssignedTicketsRoute
   '/staff/dashboard': typeof StaffDashboardRoute
+  '/staff/notifications': typeof StaffNotificationsRoute
   '/staff/profile': typeof StaffProfileRoute
   '/staff/tickets': typeof StaffTicketsRouteWithChildren
   '/student': typeof StudentLayoutRoute
@@ -272,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/student/tickets': typeof StudentTicketsRouteWithChildren
   '/super-admin': typeof SuperAdminLayoutRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/notifications': typeof SuperAdminNotificationsRoute
   '/super-admin/profile': typeof SuperAdminProfileRoute
   '/super-admin/settings': typeof SuperAdminSettingsRoute
   '/super-admin/staff': typeof SuperAdminStaffRoute
@@ -302,12 +316,14 @@ export interface FileRoutesByTo {
   '/staff': typeof StaffLayoutRoute
   '/staff/assigned-tickets': typeof StaffAssignedTicketsRoute
   '/staff/dashboard': typeof StaffDashboardRoute
+  '/staff/notifications': typeof StaffNotificationsRoute
   '/staff/profile': typeof StaffProfileRoute
   '/student': typeof StudentLayoutRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/profile': typeof StudentProfileRoute
   '/super-admin': typeof SuperAdminLayoutRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/notifications': typeof SuperAdminNotificationsRoute
   '/super-admin/profile': typeof SuperAdminProfileRoute
   '/super-admin/settings': typeof SuperAdminSettingsRoute
   '/super-admin/staff': typeof SuperAdminStaffRoute
@@ -341,6 +357,7 @@ export interface FileRoutesById {
   '/staff/_layout': typeof StaffLayoutRoute
   '/staff/assigned-tickets': typeof StaffAssignedTicketsRoute
   '/staff/dashboard': typeof StaffDashboardRoute
+  '/staff/notifications': typeof StaffNotificationsRoute
   '/staff/profile': typeof StaffProfileRoute
   '/staff/tickets': typeof StaffTicketsRouteWithChildren
   '/student': typeof StudentRouteWithChildren
@@ -351,6 +368,7 @@ export interface FileRoutesById {
   '/super-admin': typeof SuperAdminRouteWithChildren
   '/super-admin/_layout': typeof SuperAdminLayoutRoute
   '/super-admin/dashboard': typeof SuperAdminDashboardRoute
+  '/super-admin/notifications': typeof SuperAdminNotificationsRoute
   '/super-admin/profile': typeof SuperAdminProfileRoute
   '/super-admin/settings': typeof SuperAdminSettingsRoute
   '/super-admin/staff': typeof SuperAdminStaffRoute
@@ -383,6 +401,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/staff/assigned-tickets'
     | '/staff/dashboard'
+    | '/staff/notifications'
     | '/staff/profile'
     | '/staff/tickets'
     | '/student'
@@ -391,6 +410,7 @@ export interface FileRouteTypes {
     | '/student/tickets'
     | '/super-admin'
     | '/super-admin/dashboard'
+    | '/super-admin/notifications'
     | '/super-admin/profile'
     | '/super-admin/settings'
     | '/super-admin/staff'
@@ -421,12 +441,14 @@ export interface FileRouteTypes {
     | '/staff'
     | '/staff/assigned-tickets'
     | '/staff/dashboard'
+    | '/staff/notifications'
     | '/staff/profile'
     | '/student'
     | '/student/dashboard'
     | '/student/profile'
     | '/super-admin'
     | '/super-admin/dashboard'
+    | '/super-admin/notifications'
     | '/super-admin/profile'
     | '/super-admin/settings'
     | '/super-admin/staff'
@@ -459,6 +481,7 @@ export interface FileRouteTypes {
     | '/staff/_layout'
     | '/staff/assigned-tickets'
     | '/staff/dashboard'
+    | '/staff/notifications'
     | '/staff/profile'
     | '/staff/tickets'
     | '/student'
@@ -469,6 +492,7 @@ export interface FileRouteTypes {
     | '/super-admin'
     | '/super-admin/_layout'
     | '/super-admin/dashboard'
+    | '/super-admin/notifications'
     | '/super-admin/profile'
     | '/super-admin/settings'
     | '/super-admin/staff'
@@ -583,6 +607,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperAdminProfileRouteImport
       parentRoute: typeof SuperAdminRoute
     }
+    '/super-admin/notifications': {
+      id: '/super-admin/notifications'
+      path: '/notifications'
+      fullPath: '/super-admin/notifications'
+      preLoaderRoute: typeof SuperAdminNotificationsRouteImport
+      parentRoute: typeof SuperAdminRoute
+    }
     '/super-admin/dashboard': {
       id: '/super-admin/dashboard'
       path: '/dashboard'
@@ -637,6 +668,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/staff/profile'
       preLoaderRoute: typeof StaffProfileRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/notifications': {
+      id: '/staff/notifications'
+      path: '/notifications'
+      fullPath: '/staff/notifications'
+      preLoaderRoute: typeof StaffNotificationsRouteImport
       parentRoute: typeof StaffRoute
     }
     '/staff/dashboard': {
@@ -838,6 +876,7 @@ interface StaffRouteChildren {
   StaffLayoutRoute: typeof StaffLayoutRoute
   StaffAssignedTicketsRoute: typeof StaffAssignedTicketsRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
+  StaffNotificationsRoute: typeof StaffNotificationsRoute
   StaffProfileRoute: typeof StaffProfileRoute
   StaffTicketsRoute: typeof StaffTicketsRouteWithChildren
   StaffTicketTicketIdRoute: typeof StaffTicketTicketIdRoute
@@ -847,6 +886,7 @@ const StaffRouteChildren: StaffRouteChildren = {
   StaffLayoutRoute: StaffLayoutRoute,
   StaffAssignedTicketsRoute: StaffAssignedTicketsRoute,
   StaffDashboardRoute: StaffDashboardRoute,
+  StaffNotificationsRoute: StaffNotificationsRoute,
   StaffProfileRoute: StaffProfileRoute,
   StaffTicketsRoute: StaffTicketsRouteWithChildren,
   StaffTicketTicketIdRoute: StaffTicketTicketIdRoute,
@@ -890,6 +930,7 @@ const StudentRouteWithChildren =
 interface SuperAdminRouteChildren {
   SuperAdminLayoutRoute: typeof SuperAdminLayoutRoute
   SuperAdminDashboardRoute: typeof SuperAdminDashboardRoute
+  SuperAdminNotificationsRoute: typeof SuperAdminNotificationsRoute
   SuperAdminProfileRoute: typeof SuperAdminProfileRoute
   SuperAdminSettingsRoute: typeof SuperAdminSettingsRoute
   SuperAdminStaffRoute: typeof SuperAdminStaffRoute
@@ -901,6 +942,7 @@ interface SuperAdminRouteChildren {
 const SuperAdminRouteChildren: SuperAdminRouteChildren = {
   SuperAdminLayoutRoute: SuperAdminLayoutRoute,
   SuperAdminDashboardRoute: SuperAdminDashboardRoute,
+  SuperAdminNotificationsRoute: SuperAdminNotificationsRoute,
   SuperAdminProfileRoute: SuperAdminProfileRoute,
   SuperAdminSettingsRoute: SuperAdminSettingsRoute,
   SuperAdminStaffRoute: SuperAdminStaffRoute,

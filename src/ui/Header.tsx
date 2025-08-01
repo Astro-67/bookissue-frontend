@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { RiMenuLine, RiNotificationLine, RiArrowDownSLine, RiUserLine, RiLogoutBoxLine } from 'react-icons/ri'
+import { RiMenuLine, RiArrowDownSLine, RiUserLine, RiLogoutBoxLine } from 'react-icons/ri'
 import { getMediaUrl } from '../utils/media'
+import { NotificationBell } from '../features/notifications/components'
 
 interface HeaderProps {
   title: string
@@ -73,10 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Right side */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}
-          <button className="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-            <RiNotificationLine className="h-6 w-6" />
-            <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white"></span>
-          </button>
+          <NotificationBell />
 
           {/* User dropdown */}
           <div className="relative" ref={dropdownRef}>

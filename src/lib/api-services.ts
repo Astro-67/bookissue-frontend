@@ -298,9 +298,48 @@ export const commentsApi = {
   },
 };
 
+// Notifications API services
+export const notificationsApi = {
+  getNotifications: async (params?: {
+    is_read?: boolean;
+    notification_type?: string;
+    page?: number;
+    page_size?: number;
+  }) => {
+    const response = await api.get('/notifications/', { params });
+    return response.data;
+  },
+
+  getUnreadNotifications: async () => {
+    const response = await api.get('/notifications/unread/');
+    return response.data;
+  },
+
+  getUnreadCount: async () => {
+    const response = await api.get('/notifications/unread_count/');
+    return response.data;
+  },
+
+  markAsRead: async (notificationId: number) => {
+    const response = await api.post(`/notifications/${notificationId}/mark_read/`);
+    return response.data;
+  },
+
+  markAllAsRead: async () => {
+    const response = await api.post('/notifications/mark_all_read/');
+    return response.data;
+  },
+
+  deleteNotification: async (notificationId: number) => {
+    const response = await api.delete(`/notifications/${notificationId}/`);
+    return response.data;
+  },
+};
+
 export default {
   auth: authApi,
   tickets: ticketsApi,
   comments: commentsApi,
   users: usersApi,
+  notifications: notificationsApi,
 };
