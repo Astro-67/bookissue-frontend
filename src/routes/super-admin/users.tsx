@@ -476,7 +476,15 @@ function CreateUserModal({
       return
     }
     
-    onSubmit(formData)
+    // Prepare the data and clean up fields for different roles
+    const submitData = { ...formData }
+    
+    // If role is not student, clear student_id to avoid unique constraint issues
+    if (submitData.role !== 'student') {
+      submitData.student_id = ''
+    }
+    
+    onSubmit(submitData)
   }
 
   const handleCancel = () => {
