@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useRouter } from '@tanstack/react-router';
-import { NotificationIcon } from '../../../ui/Icons';
+import { 
+  NotificationIcon, 
+  CheckIcon, 
+  StatusIcon, 
+  CommentIcon, 
+  AssignedIcon, 
+  SpeakerIcon,
+  NewTicketIcon 
+} from '../../../ui/Icons';
 import { useUnreadCount, useUnreadNotifications, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from '../../../hooks/api';
-import { CheckIcon } from '../../../ui/Icons';
 import type { Notification } from '../../../types/api';
 
 // Define the component interface inline to avoid module resolution issues
@@ -34,17 +41,19 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   };
 
   const getNotificationIcon = (type: Notification['notification_type']) => {
+    const iconProps = { className: "h-4 w-4" };
+    
     switch (type) {
       case 'ticket_status':
-        return '🎫';
+        return <StatusIcon {...iconProps} />;
       case 'new_comment':
-        return '💬';
+        return <CommentIcon {...iconProps} />;
       case 'assignment':
-        return '👤';
+        return <AssignedIcon {...iconProps} />;
       case 'new_ticket':
-        return '🆕';
+        return <NewTicketIcon {...iconProps} />;
       default:
-        return '📢';
+        return <SpeakerIcon {...iconProps} />;
     }
   };
 
@@ -53,16 +62,19 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     
     // Determine user role from current path
     let userRole = 'staff';
+    let ticketPath = 'ticket'; // Default for staff, ict, super-admin
+    
     if (currentPath.includes('/ict/')) {
       userRole = 'ict';
     } else if (currentPath.includes('/super-admin/')) {
       userRole = 'super-admin';
     } else if (currentPath.includes('/student/')) {
       userRole = 'student';
+      ticketPath = 'tickets'; // Student uses plural "tickets"
     }
     
     if (notification.ticket_id) {
-      return `/${userRole}/tickets/${notification.ticket_id}`;
+      return `/${userRole}/${ticketPath}/${notification.ticket_id}`;
     }
     return '#';
   };
@@ -84,9 +96,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={`w-80 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-hidden ${className}`}>
+    <div className={`w-80 bg-white rounded-xl shadow-xl border border-gray-100 max-h-96 overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+      <div className="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-900">
             Notifications
@@ -95,7 +107,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             <button
               onClick={handleMarkAllAsRead}
               disabled={markAllAsRead.isPending}
-              className="text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50"
+              className="text-xs text-blue-600 hover:text-blue-800 disabled:opacity-50 font-medium transition-colors"
             >
               Mark all read
             </button>
@@ -117,15 +129,19 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             </div>
           </div>
         ) : !notifications || notifications.length === 0 ? (
-          <div className="px-4 py-6 text-center text-sm text-gray-500">
-            No new notifications
+          <div className="px-4 py-8 text-center text-sm text-gray-500">
+            <div className="w-12 h-12 mx-auto mb-3 bg-gray-100 rounded-full flex items-center justify-center">
+              <NotificationIcon className="h-6 w-6 text-gray-400" />
+            </div>
+            <p className="font-medium">No new notifications</p>
+            <p className="text-xs text-gray-400 mt-1">You're all caught up!</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
             {notifications.map((notification: Notification) => (
               <div
                 key={notification.id}
-                className="group relative hover:bg-gray-50 transition-colors"
+                className="group relative hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200"
               >
                 <Link
                   to={getNotificationLink(notification)}
@@ -133,17 +149,19 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                   className="block px-4 py-3"
                 >
                   <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 text-lg">
-                      {getNotificationIcon(notification.notification_type)}
+                    <div className="flex-shrink-0 p-1.5 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
+                      <div className="text-blue-600">
+                        {getNotificationIcon(notification.notification_type)}
+                      </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-gray-900 truncate group-hover:text-blue-900">
                         {notification.title}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-1 font-medium">
                         {notification.time_ago}
                       </p>
                     </div>
@@ -151,10 +169,10 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                       <button
                         onClick={(e) => handleMarkAsRead(notification.id, e)}
                         disabled={markAsRead.isPending}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-400 hover:text-green-600 disabled:opacity-50"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg disabled:opacity-50"
                         title="Mark as read"
                       >
-                        <CheckIcon className="h-4 w-4" />
+                        <CheckIcon className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </div>
@@ -167,13 +185,13 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
       {/* Footer */}
       {notifications && notifications.length > 0 && (
-        <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
+        <div className="px-4 py-3 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-blue-50">
           <Link
             to={getViewAllNotificationsLink()}
             onClick={onClose}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
           >
-            View all notifications
+            View all notifications →
           </Link>
         </div>
       )}
