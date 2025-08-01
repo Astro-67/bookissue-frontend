@@ -260,8 +260,13 @@ export const useCreateTicket = () => {
   return useMutation({
     mutationFn: ticketsApi.createTicket,
     onSuccess: () => {
-      // Just invalidate ticket list queries, don't force refetch immediately
+      // Invalidate ticket list queries
       queryClient.invalidateQueries({ queryKey: ['tickets'], type: 'all' });
+      // Invalidate notification queries to refresh unread count for ICT/admin users
+      queryClient.invalidateQueries({ queryKey: ['notifications'], type: 'all' });
+      // Force immediate notification refresh for real-time updates
+      queryClient.refetchQueries({ queryKey: ['notifications', 'unread-count'] });
+      queryClient.refetchQueries({ queryKey: ['notifications', 'unread'] });
       toast.success('Ticket created successfully!');
     },
     onError: (error: any) => {
@@ -379,9 +384,13 @@ export const useCreateComment = () => {
       queryClient.invalidateQueries({ queryKey: ['comments', 'ticket', variables.ticketId] });
       queryClient.invalidateQueries({ queryKey: ['tickets', variables.ticketId] });
       queryClient.invalidateQueries({ queryKey: ['tickets'] }); // Update comment counts in ticket list
+      // Also invalidate notifications as comments trigger notifications
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.refetchQueries({ queryKey: ['comments', 'ticket', variables.ticketId] });
       queryClient.refetchQueries({ queryKey: ['tickets', variables.ticketId] });
       queryClient.refetchQueries({ queryKey: ['tickets'] });
+      // Force immediate notification refresh
+      queryClient.refetchQueries({ queryKey: ['notifications', 'unread-count'] });
       toast.success('Comment added successfully!');
     },
     onError: (error: any) => {
@@ -625,7 +634,10 @@ export const useUnreadNotifications = () => {
   return useQuery({
     queryKey: ['notifications', 'unread'],
     queryFn: notificationsApi.getUnreadNotifications,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 5 * 1000, // 5 seconds
+    refetchInterval: 15 * 1000, // Refetch every 15 seconds
+    refetchOnWindowFocus: true, // Refetch when window gets focus
+    refetchOnReconnect: true, // Refetch when network reconnects
   });
 };
 
@@ -633,8 +645,10 @@ export const useUnreadCount = () => {
   return useQuery({
     queryKey: ['notifications', 'unread-count'],
     queryFn: notificationsApi.getUnreadCount,
-    staleTime: 30 * 1000, // 30 seconds
-    refetchInterval: 60 * 1000, // Refetch every minute
+    staleTime: 5 * 1000, // 5 seconds
+    refetchInterval: 15 * 1000, // Refetch every 15 seconds (even more frequent)
+    refetchOnWindowFocus: true, // Refetch when window gets focus
+    refetchOnReconnect: true, // Refetch when network reconnects
   });
 };
 
@@ -644,7 +658,11 @@ export const useMarkNotificationAsRead = () => {
   return useMutation({
     mutationFn: notificationsApi.markAsRead,
     onSuccess: () => {
+      // Immediately invalidate and refetch notification queries
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Force immediate refetch
+      queryClient.refetchQueries({ queryKey: ['notifications', 'unread'] });
+      queryClient.refetchQueries({ queryKey: ['notifications', 'unread-count'] });
       toast.success('Notification marked as read.');
     },
     onError: (error: any) => {
@@ -659,7 +677,11 @@ export const useMarkAllNotificationsAsRead = () => {
   return useMutation({
     mutationFn: notificationsApi.markAllAsRead,
     onSuccess: () => {
+      // Immediately invalidate and refetch notification queries
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Force immediate refetch
+      queryClient.refetchQueries({ queryKey: ['notifications', 'unread'] });
+      queryClient.refetchQueries({ queryKey: ['notifications', 'unread-count'] });
       toast.success('All notifications marked as read.');
     },
     onError: (error: any) => {

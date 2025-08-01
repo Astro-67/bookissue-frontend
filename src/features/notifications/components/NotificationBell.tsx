@@ -41,6 +41,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         return '💬';
       case 'assignment':
         return '👤';
+      case 'new_ticket':
+        return '🆕';
       default:
         return '📢';
     }
@@ -109,7 +111,10 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           </div>
         ) : error ? (
           <div className="px-4 py-6 text-center text-sm text-red-600">
-            Failed to load notifications
+            <div>Failed to load notifications</div>
+            <div className="text-xs text-gray-500 mt-1">
+              {error?.message || 'Unknown error'}
+            </div>
           </div>
         ) : !notifications || notifications.length === 0 ? (
           <div className="px-4 py-6 text-center text-sm text-gray-500">
@@ -196,8 +201,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ className = '' }) =
       >
         <NotificationIcon className="h-6 w-6" />
         {!isLoading && unreadCount?.count > 0 && (
-          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full min-w-[20px] h-5">
-            {unreadCount.count > 99 ? '99+' : unreadCount.count}
+          <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center w-4 h-4 text-xs font-semibold text-white bg-red-500 rounded-full shadow-lg ring-2 ring-white">
+            {unreadCount.count > 9 ? '9+' : unreadCount.count}
           </span>
         )}
       </button>

@@ -321,7 +321,9 @@ export const notificationsApi = {
   },
 
   markAsRead: async (notificationId: number) => {
-    const response = await api.post(`/notifications/${notificationId}/mark_read/`);
+    const response = await api.post('/notifications/mark_read/', {
+      notification_ids: [notificationId]
+    });
     return response.data;
   },
 

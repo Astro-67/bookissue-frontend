@@ -122,7 +122,7 @@ export interface Notification {
   user: number;
   title: string;
   message: string;
-  notification_type: 'ticket_status' | 'new_comment' | 'assignment' | 'general';
+  notification_type: 'ticket_status' | 'new_comment' | 'assignment' | 'new_ticket' | 'general';
   is_read: boolean;
   ticket_id?: number;
   comment_id?: number;
