@@ -1,54 +1,94 @@
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Outlet, createRootRoute, useRouterState } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { Toaster } from 'react-hot-toast'
-import { AuthProvider, useAuth } from '../contexts/AuthContext'
-import LoadingSpinner from '../ui/LoadingSpinner'
-import { SharedLayout } from '../ui/SharedLayout'
-
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import {
+  Outlet,
+  createRootRoute,
+  useRouterState,
+} from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Toaster } from "react-hot-toast";
+import { AuthProvider, useAuth } from "../contexts/AuthContext";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import { SharedLayout } from "../ui/SharedLayout";
+import { useEffect } from "react";
 
 function AuthenticatedApp() {
-  const router = useRouterState()
-  const pathname = router.location.pathname
-  const { isAuthenticated, isLoading, user } = useAuth()
+  const router = useRouterState();
+  const pathname = router.location.pathname;
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  // Role validation function
+  const isAuthorizedForPath = (userRole: string, currentPath: string): boolean => {
+    // Convert super_admin to super-admin for path checking
+    const pathRole = userRole === "super_admin" ? "super-admin" : userRole;
+    
+    // Check if the current path matches the user's role
+    if (currentPath.startsWith(`/${pathRole}/`)) {
+      return true;
+    }
+    
+    // Allow access to auth pages
+    if (currentPath === "/login" || currentPath === "/") {
+      return true;
+    }
+    
+    return false;
+  };
+
+  // Redirect to correct dashboard based on user role
+  const redirectToCorrectDashboard = (userRole: string) => {
+    const routeRole = userRole === "super_admin" ? "super-admin" : userRole;
+    window.location.href = `/${routeRole}/dashboard`;
+  };
+
+  // Security check: Handle unauthorized access with useEffect to prevent loops
+  useEffect(() => {
+    if (isAuthenticated && user && !isLoading) {
+      const isAuthPage = pathname === "/login" || pathname === "/";
+      
+      // Redirect from auth pages to dashboard if already authenticated
+      if (isAuthPage) {
+        redirectToCorrectDashboard(user.role);
+        return;
+      }
+      
+      // Check if user is authorized for current path
+      if (!isAuthorizedForPath(user.role, pathname)) {
+        redirectToCorrectDashboard(user.role);
+        return;
+      }
+    }
+  }, [isAuthenticated, user, pathname, isLoading]);
 
   // Show loading spinner while checking authentication
   if (isLoading) {
-    return <LoadingSpinner />
+    return <LoadingSpinner />;
   }
 
   // Determine if we should show the layout
-  const isAuthPage = pathname === '/login' || pathname === '/'
-  
+  const isAuthPage = pathname === "/login" || pathname === "/";
+
   // If user is not authenticated and not on auth page, redirect to login
   if (!isAuthenticated && !isAuthPage) {
-    window.location.href = '/login'
-    return <LoadingSpinner />
+    window.location.href = "/login";
+    return <LoadingSpinner />;
   }
 
-  // If user is authenticated and has user data but on auth page, redirect to dashboard
-  if (isAuthenticated && user && (pathname === '/login' || pathname === '/')) {
-    // Convert super_admin to super-admin for routing
-    const routeRole = user.role === 'super_admin' ? 'super-admin' : user.role
-    window.location.href = `/${routeRole}/dashboard`
-    return <LoadingSpinner />
+  // If no user data yet but authenticated, show loading
+  if (isAuthenticated && !user) {
+    return <LoadingSpinner />;
   }
-  
-  // Determine the role based on the current path or user role
-  let role: 'student' | 'staff' | 'ict' | 'super_admin' = user?.role || 'student'
-  if (pathname.startsWith('/staff')) {
-    role = 'staff'
-  } else if (pathname.startsWith('/ict')) {
-    role = 'ict'
-  } else if (pathname.startsWith('/student')) {
-    role = 'student'
-  } else if (pathname.startsWith('/super-admin')) {
-    role = 'super_admin'
+
+  // If user is trying to access unauthorized path, show loading while redirecting
+  if (isAuthenticated && user && !isAuthPage && !isAuthorizedForPath(user.role, pathname)) {
+    return <LoadingSpinner />;
   }
+
+  // Determine the role based on the user's actual role (not path)
+  const role: "student" | "staff" | "ict" | "super_admin" = user?.role || "student";
 
   return (
     <>
-      {(pathname === '/login' || pathname === '/') ? (
+      {pathname === "/login" || pathname === "/" ? (
         // No layout for auth pages
         <Outlet />
       ) : (
@@ -79,17 +119,17 @@ function AuthenticatedApp() {
       <ReactQueryDevtools initialIsOpen={false} />
       <TanStackRouterDevtools />
     </>
-  )
+  );
 }
 
 function RootComponent() {
   return (
-      <AuthProvider>
-        <AuthenticatedApp />
-      </AuthProvider>
-  )
+    <AuthProvider>
+      <AuthenticatedApp />
+    </AuthProvider>
+  );
 }
 
 export const Route = createRootRoute({
   component: RootComponent,
-})
+});
