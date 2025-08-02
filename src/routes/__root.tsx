@@ -44,7 +44,7 @@ function AuthenticatedApp() {
     if (!isAuthenticated) {
       const isAuthPage = pathname === "/login" || pathname === "/";
       if (!isAuthPage) {
-        navigate({ to: "/login" });
+        navigate({ to: "/login", replace: true });
       }
       return;
     }

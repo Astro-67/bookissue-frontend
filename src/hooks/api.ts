@@ -32,13 +32,15 @@ export const useLogout = () => {
       return authApi.logout(refreshToken);
     },
     onSuccess: () => {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
+      // Don't clear tokens here - AuthContext handles this
+      // Just clear React Query cache
       queryClient.clear();
       toast.success('Logged out successfully.');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Logout failed.');
+    onError: () => {
+      // Don't show error toast - logout locally succeeded even if backend fails
+      // Just clear React Query cache
+      queryClient.clear();
     },
   });
 };

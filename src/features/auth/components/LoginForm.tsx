@@ -10,6 +10,7 @@ export const LoginForm: React.FC = () => {
     password: ''
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   const loginMutation = useLogin()
 
@@ -18,10 +19,14 @@ export const LoginForm: React.FC = () => {
     
     loginMutation.mutate(formData, {
       onSuccess: () => {
+        // Set redirecting state to show loading and prevent form flash
+        setIsRedirecting(true)
         // Don't navigate here - let the root component handle the redirect
         // The AuthContext will update and trigger the redirect logic in __root.tsx
       },
       onError: () => {
+        // Reset redirecting state on error
+        setIsRedirecting(false)
         // Error is already handled by the mutation state
       },
     })
@@ -36,6 +41,18 @@ export const LoginForm: React.FC = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(prev => !prev)
+  }
+
+  // Show loading screen if redirecting after successful login
+  if (isRedirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -122,13 +139,18 @@ export const LoginForm: React.FC = () => {
           <div>
             <button
               type="submit"
-              disabled={loginMutation.isPending}
+              disabled={loginMutation.isPending || isRedirecting}
               className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:bg-blue-300 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
             >
               {loginMutation.isPending ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Signing in...
+                </div>
+              ) : isRedirecting ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Redirecting...
                 </div>
               ) : (
                 'Sign in'

@@ -86,17 +86,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     
+    // Update state immediately
+    setIsAuthenticated(false);
+    setHasToken(false);
+    setIsInitialized(true);
+    
     // Trigger auth change event
     window.dispatchEvent(new Event('auth-change'));
-    
-    setIsAuthenticated(false);
-    setIsInitialized(true);
     
     // Attempt to notify backend (don't block on this)
     if (refreshToken && !logoutMutation.isPending) {
       logoutMutation.mutate(undefined, {
-        onSettled: () => {
-          // Don't redirect here - let the root component handle navigation
+        onSuccess: () => {
+          // Backend logout successful, but we've already cleared local state
+        },
+        onError: () => {
+          // Backend logout failed, but we've already cleared local state
+          // This is not critical since tokens are already cleared
         }
       });
     }
