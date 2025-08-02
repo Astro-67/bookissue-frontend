@@ -33,7 +33,7 @@ function AuthenticatedApp() {
   // Navigate to correct dashboard
   const redirectToCorrectDashboard = (userRole: string) => {
     const routeRole = userRole === "super_admin" ? "super-admin" : userRole;
-    navigate({ to: `/${routeRole}/dashboard` });
+    navigate({ to: `/${routeRole}/dashboard`, replace: true });
   };
 
   // Redirect if authenticated and on wrong path

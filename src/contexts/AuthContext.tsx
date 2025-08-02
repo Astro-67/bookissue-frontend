@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useCurrentUser, useLogout } from '../hooks/api';
 import type { User } from '../types/api';
 
@@ -94,15 +95,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Trigger auth change event
     window.dispatchEvent(new Event('auth-change'));
     
+    // Show logout success message immediately
+    toast.success('Logged out successfully.');
+    
     // Attempt to notify backend (don't block on this)
     if (refreshToken && !logoutMutation.isPending) {
       logoutMutation.mutate(undefined, {
         onSuccess: () => {
-          // Backend logout successful, but we've already cleared local state
+          // Backend logout successful - already showed success message
         },
         onError: () => {
-          // Backend logout failed, but we've already cleared local state
-          // This is not critical since tokens are already cleared
+          // Backend logout failed, but local logout succeeded
+          // Don't show error since user is already logged out locally
         }
       });
     }

@@ -33,9 +33,9 @@ export const useLogout = () => {
     },
     onSuccess: () => {
       // Don't clear tokens here - AuthContext handles this
+      // Don't show toast here - AuthContext handles this
       // Just clear React Query cache
       queryClient.clear();
-      toast.success('Logged out successfully.');
     },
     onError: () => {
       // Don't show error toast - logout locally succeeded even if backend fails
