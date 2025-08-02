@@ -67,15 +67,30 @@ function AuthenticatedApp() {
     }
   }, [isAuthenticated, user, pathname, isLoading, navigate]);
 
-  const isAuthPage = pathname === "/login" || pathname === "/";
-
   // Wait for auth status to be ready
-  if (isLoading || (isAuthenticated && !user)) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  // Prevent rendering unauthorized paths
-  if (isAuthenticated && user && !isAuthorizedForPath(user.role, pathname)) {
+  const isAuthPage = pathname === "/login" || pathname === "/";
+
+  // If user is authenticated but doesn't have user data yet, wait
+  if (isAuthenticated && !user) {
+    return <LoadingSpinner />;
+  }
+
+  // If authenticated user is on auth page, show loading while redirecting
+  if (isAuthenticated && user && isAuthPage) {
+    return <LoadingSpinner />;
+  }
+
+  // If unauthenticated user is not on auth page, show loading while redirecting
+  if (!isAuthenticated && !isAuthPage) {
+    return <LoadingSpinner />;
+  }
+
+  // Prevent rendering unauthorized paths for authenticated users
+  if (isAuthenticated && user && !isAuthPage && !isAuthorizedForPath(user.role, pathname)) {
     return <LoadingSpinner />;
   }
 
@@ -83,12 +98,17 @@ function AuthenticatedApp() {
 
   return (
     <>
-      {isAuthPage ? (
+      {(isAuthPage && !isAuthenticated) ? (
+        // Only show auth pages for unauthenticated users
         <Outlet />
-      ) : (
+      ) : !isAuthPage && isAuthenticated && user ? (
+        // Show dashboard layout for authenticated users on dashboard pages
         <SharedLayout role={role}>
           <Outlet />
         </SharedLayout>
+      ) : (
+        // Show loading for any other state
+        <LoadingSpinner />
       )}
 
       <Toaster

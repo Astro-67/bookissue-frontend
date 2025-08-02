@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri'
 import { Logo } from '../../../ui/Logo'
 import { useLogin } from '../../../hooks/api'
+import { useAuth } from '../../../contexts/AuthContext'
 import type { LoginCredentials } from '../../../types/api'
 
 export const LoginForm: React.FC = () => {
@@ -11,6 +12,7 @@ export const LoginForm: React.FC = () => {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
+  const { isAuthenticated, user } = useAuth()
 
   const loginMutation = useLogin()
 
@@ -41,6 +43,18 @@ export const LoginForm: React.FC = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(prev => !prev)
+  }
+
+  // If user is already authenticated, show loading instead of form
+  if (isAuthenticated && user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    )
   }
 
   // Show loading screen if redirecting after successful login
