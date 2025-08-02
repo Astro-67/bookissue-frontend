@@ -10,6 +10,10 @@ export const useLogin = () => {
     onSuccess: (data) => {
       localStorage.setItem('access_token', data.tokens.access);
       localStorage.setItem('refresh_token', data.tokens.refresh);
+      
+      // Trigger auth change event to notify AuthContext
+      window.dispatchEvent(new Event('auth-change'));
+      
       toast.success('Login successful! Welcome back.');
     },
     onError: (error: any) => {

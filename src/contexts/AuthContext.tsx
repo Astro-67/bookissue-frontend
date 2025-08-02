@@ -26,10 +26,30 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [hasToken, setHasToken] = useState(!!localStorage.getItem('access_token'));
   const logoutMutation = useLogout();
   
-  // Check if there's a token in localStorage
-  const hasToken = !!localStorage.getItem('access_token');
+  // Check for token changes (reactive to localStorage)
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem('access_token');
+      setHasToken(!!token);
+    };
+    
+    // Check immediately
+    checkToken();
+    
+    // Listen for storage events (for cross-tab updates)
+    window.addEventListener('storage', checkToken);
+    
+    // Custom event for same-tab updates
+    window.addEventListener('auth-change', checkToken);
+    
+    return () => {
+      window.removeEventListener('storage', checkToken);
+      window.removeEventListener('auth-change', checkToken);
+    };
+  }, []);
   
   // Fetch current user data if there's a token
   const { data: user, isLoading, error } = useCurrentUser();
@@ -65,6 +85,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Clear tokens immediately for UI responsiveness
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    
+    // Trigger auth change event
+    window.dispatchEvent(new Event('auth-change'));
+    
     setIsAuthenticated(false);
     setIsInitialized(true);
     
@@ -72,14 +96,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (refreshToken && !logoutMutation.isPending) {
       logoutMutation.mutate(undefined, {
         onSettled: () => {
-          // Redirect to login after backend call completes (success or failure)
-          window.location.href = '/login';
+          // Don't redirect here - let the root component handle navigation
         }
       });
-    } else {
-      // Redirect immediately if no refresh token
-      window.location.href = '/login';
     }
+    // Don't redirect here - let the root component handle navigation
   };
 
   const value: AuthContextType = {

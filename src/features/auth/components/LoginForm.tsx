@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
 import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri'
 import { Logo } from '../../../ui/Logo'
 import { useLogin } from '../../../hooks/api'
 import type { LoginCredentials } from '../../../types/api'
 
 export const LoginForm: React.FC = () => {
-  const router = useRouter()
   const [formData, setFormData] = useState<LoginCredentials>({
     email: '',
     password: ''
@@ -19,12 +17,9 @@ export const LoginForm: React.FC = () => {
     e.preventDefault()
     
     loginMutation.mutate(formData, {
-      onSuccess: (data) => {
-        // Navigate to appropriate dashboard based on user role
-        const role = data.user.role
-        // Convert super_admin to super-admin for routing
-        const routeRole = role === 'super_admin' ? 'super-admin' : role
-        router.navigate({ to: `/${routeRole}/dashboard` })
+      onSuccess: () => {
+        // Don't navigate here - let the root component handle the redirect
+        // The AuthContext will update and trigger the redirect logic in __root.tsx
       },
       onError: () => {
         // Error is already handled by the mutation state

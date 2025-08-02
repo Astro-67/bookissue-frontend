@@ -2,6 +2,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   Outlet,
   createRootRoute,
+  useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -13,36 +14,43 @@ import { useEffect } from "react";
 
 function AuthenticatedApp() {
   const router = useRouterState();
+  const navigate = useNavigate();
   const pathname = router.location.pathname;
   const { isAuthenticated, isLoading, user } = useAuth();
 
-  // Role validation function
+  // Role-based path authorization
   const isAuthorizedForPath = (userRole: string, currentPath: string): boolean => {
-    // Convert super_admin to super-admin for path checking
     const pathRole = userRole === "super_admin" ? "super-admin" : userRole;
-    
-    // Check if the current path matches the user's role
-    if (currentPath.startsWith(`/${pathRole}/`)) {
-      return true;
-    }
-    
-    // Allow access to auth pages
-    if (currentPath === "/login" || currentPath === "/") {
-      return true;
-    }
-    
+
+    if (currentPath.startsWith(`/${pathRole}/`)) return true;
+
+    // Allow access to public auth pages
+    if (currentPath === "/login" || currentPath === "/") return true;
+
     return false;
   };
 
-  // Redirect to correct dashboard based on user role
+  // Navigate to correct dashboard
   const redirectToCorrectDashboard = (userRole: string) => {
     const routeRole = userRole === "super_admin" ? "super-admin" : userRole;
-    window.location.href = `/${routeRole}/dashboard`;
+    navigate({ to: `/${routeRole}/dashboard` });
   };
 
-  // Security check: Handle unauthorized access with useEffect to prevent loops
+  // Redirect if authenticated and on wrong path
   useEffect(() => {
-    if (isAuthenticated && user && !isLoading) {
+    if (isLoading) return;
+
+    // Handle unauthenticated users - redirect to login
+    if (!isAuthenticated) {
+      const isAuthPage = pathname === "/login" || pathname === "/";
+      if (!isAuthPage) {
+        navigate({ to: "/login" });
+      }
+      return;
+    }
+
+    // Handle authenticated users with user data
+    if (isAuthenticated && user) {
       const isAuthPage = pathname === "/login" || pathname === "/";
       
       // Redirect from auth pages to dashboard if already authenticated
@@ -57,57 +65,39 @@ function AuthenticatedApp() {
         return;
       }
     }
-  }, [isAuthenticated, user, pathname, isLoading]);
+  }, [isAuthenticated, user, pathname, isLoading, navigate]);
 
-  // Show loading spinner while checking authentication
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
-  // Determine if we should show the layout
   const isAuthPage = pathname === "/login" || pathname === "/";
 
-  // If user is not authenticated and not on auth page, redirect to login
-  if (!isAuthenticated && !isAuthPage) {
-    window.location.href = "/login";
+  // Wait for auth status to be ready
+  if (isLoading || (isAuthenticated && !user)) {
     return <LoadingSpinner />;
   }
 
-  // If no user data yet but authenticated, show loading
-  if (isAuthenticated && !user) {
+  // Prevent rendering unauthorized paths
+  if (isAuthenticated && user && !isAuthorizedForPath(user.role, pathname)) {
     return <LoadingSpinner />;
   }
 
-  // If user is trying to access unauthorized path, show loading while redirecting
-  if (isAuthenticated && user && !isAuthPage && !isAuthorizedForPath(user.role, pathname)) {
-    return <LoadingSpinner />;
-  }
-
-  // Determine the role based on the user's actual role (not path)
   const role: "student" | "staff" | "ict" | "super_admin" = user?.role || "student";
 
   return (
     <>
-      {pathname === "/login" || pathname === "/" ? (
-        // No layout for auth pages
+      {isAuthPage ? (
         <Outlet />
       ) : (
-        // Show layout for dashboard pages
         <SharedLayout role={role}>
           <Outlet />
         </SharedLayout>
       )}
+
       <Toaster
         position="top-center"
         gutter={12}
         containerStyle={{ margin: "8px" }}
         toastOptions={{
-          success: {
-            duration: 3000,
-          },
-          error: {
-            duration: 5000,
-          },
+          success: { duration: 3000 },
+          error: { duration: 5000 },
           style: {
             fontSize: "16px",
             backgroundColor: "#ffffff",
@@ -116,6 +106,7 @@ function AuthenticatedApp() {
           },
         }}
       />
+
       <ReactQueryDevtools initialIsOpen={false} />
       <TanStackRouterDevtools />
     </>
