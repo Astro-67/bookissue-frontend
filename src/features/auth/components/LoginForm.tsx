@@ -41,6 +41,69 @@ export const LoginForm: React.FC = () => {
     }))
   }
 
+  // Helper function to get user-friendly error message
+  const getErrorMessage = (error: any): string => {
+    // Check for specific API error messages first
+    if (error?.response?.data?.detail) {
+      const detail = error.response.data.detail;
+      // Handle common API error messages
+      if (detail.toLowerCase().includes('invalid credentials') || 
+          detail.toLowerCase().includes('invalid email') || 
+          detail.toLowerCase().includes('invalid password')) {
+        return 'Invalid email or password. Please check your credentials and try again.';
+      }
+      if (detail.toLowerCase().includes('account disabled') || 
+          detail.toLowerCase().includes('user inactive')) {
+        return 'Your account has been disabled. Please contact support.';
+      }
+      if (detail.toLowerCase().includes('too many attempts')) {
+        return 'Too many login attempts. Please wait a few minutes before trying again.';
+      }
+      // Return the detail if it's user-friendly
+      return detail;
+    }
+
+    // Check for other message formats
+    if (error?.response?.data?.message) {
+      return error.response.data.message;
+    }
+
+    // Handle different HTTP status codes with user-friendly messages
+    if (error?.response?.status) {
+      switch (error.response.status) {
+        case 400:
+          return 'Invalid login information. Please check your email and password.';
+        case 401:
+          return 'Invalid email or password. Please try again.';
+        case 403:
+          return 'Access denied. Your account may be suspended.';
+        case 404:
+          return 'Login service not found. Please try again later.';
+        case 429:
+          return 'Too many login attempts. Please wait a few minutes before trying again.';
+        case 500:
+          return 'Server error. Please try again later.';
+        case 503:
+          return 'Service temporarily unavailable. Please try again later.';
+        default:
+          return 'Login failed. Please check your credentials and try again.';
+      }
+    }
+
+    // Handle network errors
+    if (error?.message) {
+      if (error.message.toLowerCase().includes('network')) {
+        return 'Network error. Please check your internet connection and try again.';
+      }
+      if (error.message.toLowerCase().includes('timeout')) {
+        return 'Request timed out. Please try again.';
+      }
+    }
+
+    // Default fallback message
+    return 'Login failed. Please check your credentials and try again.';
+  };
+
   const togglePasswordVisibility = () => {
     setShowPassword(prev => !prev)
   }
@@ -175,10 +238,7 @@ export const LoginForm: React.FC = () => {
           {loginMutation.error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <p className="text-red-800 text-sm text-center">
-                {(loginMutation.error as any)?.response?.data?.detail || 
-                 (loginMutation.error as any)?.response?.data?.message ||
-                 (loginMutation.error as any)?.message || 
-                 'Login failed. Please check your credentials.'}
+                {getErrorMessage(loginMutation.error)}
               </p>
             </div>
           )}
