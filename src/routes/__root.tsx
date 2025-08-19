@@ -19,7 +19,10 @@ function AuthenticatedApp() {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   // Role-based path authorization
-  const isAuthorizedForPath = (userRole: string, currentPath: string): boolean => {
+  const isAuthorizedForPath = (
+    userRole: string,
+    currentPath: string
+  ): boolean => {
     const pathRole = userRole === "super_admin" ? "super-admin" : userRole;
 
     if (currentPath.startsWith(`/${pathRole}/`)) return true;
@@ -52,13 +55,13 @@ function AuthenticatedApp() {
     // Handle authenticated users with user data
     if (isAuthenticated && user) {
       const isAuthPage = pathname === "/login" || pathname === "/";
-      
+
       // Redirect from auth pages to dashboard if already authenticated
       if (isAuthPage) {
         redirectToCorrectDashboard(user.role);
         return;
       }
-      
+
       // Check if user is authorized for current path
       if (!isAuthorizedForPath(user.role, pathname)) {
         redirectToCorrectDashboard(user.role);
@@ -90,15 +93,21 @@ function AuthenticatedApp() {
   }
 
   // Prevent rendering unauthorized paths for authenticated users
-  if (isAuthenticated && user && !isAuthPage && !isAuthorizedForPath(user.role, pathname)) {
+  if (
+    isAuthenticated &&
+    user &&
+    !isAuthPage &&
+    !isAuthorizedForPath(user.role, pathname)
+  ) {
     return <LoadingSpinner />;
   }
 
-  const role: "student" | "staff" | "ict" | "super_admin" = user?.role || "student";
+  const role: "student" | "staff" | "ict" | "super_admin" =
+    user?.role || "student";
 
   return (
     <>
-      {(isAuthPage && !isAuthenticated) ? (
+      {isAuthPage && !isAuthenticated ? (
         // Only show auth pages for unauthenticated users
         <Outlet />
       ) : !isAuthPage && isAuthenticated && user ? (
